@@ -1381,7 +1381,7 @@ select,input[type=text]{padding:5px 8px;border:1px solid #ccc;border-radius:4px;
 .cl-tooltip::before{border-top-color:#1a3a5c}
 .qe-tooltip{background:#e65100;color:white;border:none;border-radius:4px;padding:2px 7px;font-size:12px;font-weight:bold;box-shadow:0 2px 6px rgba(0,0,0,0.3);white-space:nowrap}
 .qe-tooltip::before{border-top-color:#e65100}
-@keyframes qe-pulse{0%{box-shadow:0 0 0 4px rgba(255,152,0,0.6),0 0 12px 6px rgba(255,152,0,0.4)}50%{box-shadow:0 0 0 8px rgba(255,152,0,0.2),0 0 18px 10px rgba(255,152,0,0.15)}100%{box-shadow:0 0 0 4px rgba(255,152,0,0.6),0 0 12px 6px rgba(255,152,0,0.4)}}
+@keyframes qe-pulse{0%{box-shadow:0 0 0 4px rgba(229,57,53,0.6),0 0 12px 6px rgba(229,57,53,0.4)}50%{box-shadow:0 0 0 8px rgba(229,57,53,0.2),0 0 18px 10px rgba(229,57,53,0.15)}100%{box-shadow:0 0 0 4px rgba(229,57,53,0.6),0 0 12px 6px rgba(229,57,53,0.4)}}
 @keyframes cl-pulse{0%{box-shadow:0 0 0 5px rgba(229,57,53,0.7),0 0 14px 7px rgba(229,57,53,0.5);transform:scale(1)}50%{box-shadow:0 0 0 10px rgba(229,57,53,0.2),0 0 22px 12px rgba(229,57,53,0.2);transform:scale(1.2)}100%{box-shadow:0 0 0 5px rgba(229,57,53,0.7),0 0 14px 7px rgba(229,57,53,0.5);transform:scale(1)}}
 .cl-found{animation:cl-pulse 0.8s infinite}
 .geo-dot{width:14px;height:14px;border-radius:50%;background:#9C27B0;border:3px solid white;box-shadow:0 0 0 2px #9C27B0}
@@ -1689,7 +1689,7 @@ function mkIcon(color,size,border){
 }
 function mkIconQE(color,pulse){
   color=color||'#FF9800';
-  var glow=pulse?'box-shadow:0 0 0 4px rgba(255,152,0,0.6),0 0 12px 6px rgba(255,152,0,0.4);animation:qe-pulse 1s infinite;':'box-shadow:0 2px 5px rgba(0,0,0,0.4);';
+  var glow=pulse?'box-shadow:0 0 0 4px rgba(229,57,53,0.6),0 0 12px 6px rgba(229,57,53,0.4);animation:qe-pulse 1s infinite;':'box-shadow:0 2px 5px rgba(0,0,0,0.4);';
   return L.divIcon({className:'',
     html:'<div style="width:22px;height:16px;background:'+color+';border:2px solid white;border-radius:3px;'+glow+'display:flex;align-items:center;justify-content:center"><span style="font-size:9px;color:white;font-weight:bold;line-height:1">QE</span></div>',
     iconSize:[22,16],iconAnchor:[11,8]});
@@ -1697,7 +1697,7 @@ function mkIconQE(color,pulse){
 const iconLED=mkIcon('#2ecc71',16);
 const iconAnte=mkIcon('#2196F3',16);
 const iconQE=mkIconQE('#FF9800',false);
-const iconQEhl=mkIconQE('#e65100',true);
+const iconQEhl=mkIconQE('#e53935',true);
 const iconHL=mkIcon('#FFD700',18,'#333');
 const iconFound=L.divIcon({className:'',html:'<div class="cl-found" style="width:22px;height:22px;border-radius:50%;background:#e53935;border:3px solid white"></div>',iconSize:[22,22],iconAnchor:[11,11]});
 var _foundCL=null;
