@@ -1903,10 +1903,10 @@ function doSearch(){
       var numStripped=String(parseInt(numPart,10));
       var hit=numPart.indexOf(q)>=0||numStripped===q||m.data.indirizzo.toLowerCase().indexOf(q)>=0;
       m.setOpacity(hit?1:0.10);
-      if(hit&&!found){found=m;openQE(m.data,m);}
+      if(hit&&!found){found=m;}
     });
     markersCL.forEach(function(m){m.setOpacity(attivo(m)?0.06:0);});
-    if(found)map.setView(found.getLatLng(),17);
+    if(found){map.setView(found.getLatLng(),17);goToQE(found.data.comune,found.data.id);}
   } else {
     var found=null;
     markersCL.forEach(function(m){
