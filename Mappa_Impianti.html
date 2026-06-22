@@ -1382,6 +1382,8 @@ select,input[type=text]{padding:5px 8px;border:1px solid #ccc;border-radius:4px;
 .qe-tooltip{background:#e65100;color:white;border:none;border-radius:4px;padding:2px 7px;font-size:12px;font-weight:bold;box-shadow:0 2px 6px rgba(0,0,0,0.3);white-space:nowrap}
 .qe-tooltip::before{border-top-color:#e65100}
 @keyframes qe-pulse{0%{box-shadow:0 0 0 4px rgba(255,152,0,0.6),0 0 12px 6px rgba(255,152,0,0.4)}50%{box-shadow:0 0 0 8px rgba(255,152,0,0.2),0 0 18px 10px rgba(255,152,0,0.15)}100%{box-shadow:0 0 0 4px rgba(255,152,0,0.6),0 0 12px 6px rgba(255,152,0,0.4)}}
+@keyframes cl-pulse{0%{box-shadow:0 0 0 5px rgba(255,215,0,0.7),0 0 14px 7px rgba(255,215,0,0.5);transform:scale(1)}50%{box-shadow:0 0 0 10px rgba(255,215,0,0.2),0 0 22px 12px rgba(255,215,0,0.2);transform:scale(1.2)}100%{box-shadow:0 0 0 5px rgba(255,215,0,0.7),0 0 14px 7px rgba(255,215,0,0.5);transform:scale(1)}}
+.cl-found{animation:cl-pulse 0.8s infinite}
 .geo-dot{width:14px;height:14px;border-radius:50%;background:#9C27B0;border:3px solid white;box-shadow:0 0 0 2px #9C27B0}
 /* Guasti */
 .gbadge{display:inline-block;padding:1px 7px;border-radius:8px;font-size:11px;font-weight:bold;margin-left:6px;vertical-align:middle}
@@ -1697,6 +1699,8 @@ const iconAnte=mkIcon('#2196F3',16);
 const iconQE=mkIconQE('#FF9800',false);
 const iconQEhl=mkIconQE('#e65100',true);
 const iconHL=mkIcon('#FFD700',18,'#333');
+const iconFound=L.divIcon({className:'',html:'<div class="cl-found" style="width:22px;height:22px;border-radius:50%;background:#FFD700;border:3px solid #333"></div>',iconSize:[22,22],iconAnchor:[11,11]});
+var _foundCL=null;
 
 const layerCL=L.layerGroup().addTo(map);
 const layerQE=L.layerGroup().addTo(map);
@@ -1808,6 +1812,7 @@ function resetHighlight(){
   markersCL.forEach(function(m){m.setOpacity(1);});
   markersQE.forEach(function(m){m.setOpacity(1);});
   if(_hlQE){_hlQE.setIcon(iconQE);_hlQE=null;}
+  if(_foundCL){_foundCL.setIcon(_foundCL.isLED?iconLED:iconAnte);_foundCL=null;}
 }
 
 function highlightCL(key){
@@ -1917,7 +1922,13 @@ function doSearch(){
       if(hit&&!found){found=m;openCL(d,m);}
     });
     markersQE.forEach(function(m){m.setOpacity(attivo(m)?0.06:0);});
-    if(found)map.setView(found.getLatLng(),17);
+    if(found){
+      map.setView(found.getLatLng(),17);
+      if(_foundCL){_foundCL.setIcon(_foundCL.isLED?iconLED:iconAnte);}
+      _foundCL=found;
+      found.setIcon(iconFound);
+      setTimeout(function(){if(_foundCL===found){found.setIcon(found.isLED?iconLED:iconAnte);_foundCL=null;}},6000);
+    }
   }
 }
 
