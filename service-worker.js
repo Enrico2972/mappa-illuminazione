@@ -1,4 +1,4 @@
-const CACHE = 'impianti-v1';
+const CACHE = 'impianti-v2';
 const FILES = [
   '/mappa-illuminazione/Mappa_Impianti.html',
   '/mappa-illuminazione/index.html'
