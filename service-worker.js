@@ -1,7 +1,8 @@
-const CACHE = 'impianti-v2';
+const CACHE = 'impianti-v3';
 const FILES = [
   '/mappa-illuminazione/Mappa_Impianti.html',
-  '/mappa-illuminazione/index.html'
+  '/mappa-illuminazione/index.html',
+  '/mappa-illuminazione/comuni_index.json'
 ];
 
 self.addEventListener('install', function(e) {
