@@ -1352,33 +1352,47 @@ svg.leaflet-image-layer.leaflet-interactive path {
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,sans-serif;display:flex;flex-direction:column;height:100vh;overflow:hidden}
-#topbar{background:#111827;color:white;padding:0 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;z-index:1000;min-height:52px;border-bottom:1px solid #374151}
+#topbar{background:#0d1117;color:white;padding:0 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;z-index:1000;min-height:52px;border-bottom:1px solid #1e2d3d}
 #topbar h1{font-size:15px;font-weight:700;color:white;letter-spacing:.3px}
 .leg{display:flex;align-items:center;gap:4px;font-size:12px}
 .dot{width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,0.7);flex-shrink:0}
 .dot-led{background:#22c55e}.dot-ante{background:#3b82f6}.dot-qe{background:#f97316}.dot-sem{background:#9C27B0}.dot-qesem{background:#6a1b9a}
-#controls{background:#1f2937;border-bottom:1px solid #374151;padding:6px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
-select,input[type=text]{padding:5px 8px;border:1px solid #374151;border-radius:6px;font-size:13px;background:#111827;color:white}
-#comune-sel{min-width:160px;cursor:pointer;border-color:#f97316;color:#f97316;font-weight:bold;background:#111827}
-.tbtn{padding:4px 10px;border:1px solid;border-radius:6px;cursor:pointer;font-size:12px;font-weight:bold;background:transparent;white-space:nowrap;color:white}
-.tbtn-cl{border-color:#3b82f6;color:#3b82f6}.tbtn-cl.on{background:#3b82f6;color:white}
-.tbtn-qe{border-color:#f97316;color:#f97316}.tbtn-qe.on{background:#f97316;color:white}
-.tbtn-sem{border-color:#7B1FA2;color:#7B1FA2}.tbtn-sem.on{background:#7B1FA2;color:white}
-.tbtn-qesem{border-color:#4A148C;color:#4A148C}.tbtn-qesem.on{background:#4A148C;color:white}
-.tbtn-guasti{border-color:#c0392b;color:#c0392b}.tbtn-guasti.on{background:#c0392b;color:white}
-.tbtn-geo{border-color:#9C27B0;color:#9C27B0;padding:4px 8px}
+#controls{background:#0d1117;border-bottom:1px solid #1e2d3d;padding:6px 12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px}
+select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5px;font-size:12px;font-weight:bold;font-family:Arial,sans-serif;background:#111827;color:#e2e8f0}
+#comune-sel{min-width:160px;cursor:pointer;border-color:#f97316;color:#e2e8f0;font-weight:bold;background:#111827}
+.tbtn{padding:4px 9px;border:1px solid #2d3748;border-radius:5px;cursor:pointer;font-size:12px;font-weight:bold;background:#111827;white-space:nowrap;color:#e2e8f0;font-family:Arial,sans-serif}
+.tbtn-cl.on{border-color:#22c55e;background:#0a1e14}
+.tbtn-qe.on{border-color:#22c55e;background:#0a1e14}
+.tbtn-sem.on{border-color:#22c55e;background:#0a1e14}
+.tbtn-qesem.on{border-color:#22c55e;background:#0a1e14}
+.tbtn-guasti.on{border-color:#22c55e;background:#0a1e14}
+.tbtn-ante.on{border-color:#22c55e;background:#0a1e14}
+.tbtn-geo{border:1px solid #2d3748;color:#e2e8f0;background:#111827;padding:4px 8px;border-radius:5px;cursor:pointer;font-size:12px;font-family:Arial,sans-serif;font-weight:bold}
+.btn-topbar{padding:4px 10px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:bold;font-family:Arial,sans-serif;white-space:nowrap;border:1px solid;color:#e2e8f0}
+#btn-sat{background:#0d2040;border-color:#3b82f6}
+.btn-reset-top{background:#111827;border-color:#374151}
+.btn-stat-top{background:#150a1e;border-color:#6a1b9a}
+.btn-foglio-top{background:#0a1e14;border-color:#15803d;text-decoration:none;display:inline-flex;align-items:center}
 .sep{width:1px;background:#374151;height:22px;margin:0 2px}
 #counter{margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0}
 .cnt-badge{background:#374151;border:1px solid #4b5563;color:white;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:bold;white-space:nowrap}
 #main{display:flex;flex:1;overflow:hidden;position:relative}
 #map{flex:1}
-#panel{width:340px;background:white;border-left:1px solid #ddd;display:none;flex-direction:column}
-#panel-header{background:#1f2937;color:white;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-weight:bold;font-size:14px;flex-shrink:0}
+#panel{width:340px;background:#0d1117;border-left:1px solid #1e2d3d;display:none;flex-direction:column}
+#panel-header{background:#0d1b2e;color:white;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-weight:bold;font-size:14px;flex-shrink:0;border-bottom:2px solid #22c55e}
 #panel-close{cursor:pointer;font-size:20px;opacity:.8;padding:0 4px}
 #panel-close:hover{opacity:1}
 #panel-body{padding:12px;overflow-y:auto;flex:1}
 .sec{background:#eff6ff;color:#1f2937;font-weight:bold;font-size:11px;padding:5px 8px;margin:10px 0 5px;border-left:3px solid #1f2937;text-transform:uppercase;letter-spacing:.5px}
 .sec.post{background:#f0fdf4;color:#15803d;border-left-color:#22c55e}
+.app-tabs{display:flex;border:1px solid #1e2d3d;border-radius:6px 6px 0 0;overflow:hidden;margin:10px 0 0;background:#111827}
+.app-tab{flex:1;padding:8px 4px;text-align:center;font-size:12px;font-weight:bold;cursor:pointer;border:none;border-bottom:2px solid transparent;background:transparent;color:#64748b}
+.app-tab.act-ante{color:#60a5fa;background:#0d2040;border-bottom-color:#3b82f6}
+.app-tab.act-post{color:#4ade80;background:#0a1e14;border-bottom-color:#22c55e}
+.app-tab-body{border:1px solid #1e2d3d;border-top:none;border-radius:0 0 6px 6px;background:#111827;padding:2px 8px 6px;margin-bottom:6px}
+.app-tab-body .fr{border-bottom-color:#1e293b}
+.app-tab-body .fl{color:#64748b}
+.app-tab-body .fv{color:#e2e8f0;font-weight:500}
 .fr{display:flex;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:13px}
 .fl{color:#777;width:130px;min-width:130px;font-size:11px;line-height:1.3}
 .fv{color:#222;font-weight:500;flex:1;line-height:1.3}
@@ -1416,6 +1430,8 @@ select,input[type=text]{padding:5px 8px;border:1px solid #374151;border-radius:6
 .guasto-note{color:#888;font-style:italic}
 .btn-guasto{display:block;width:100%;margin-top:6px;padding:8px;background:#ef4444;color:white;border:none;border-radius:6px;font-size:13px;font-weight:bold;cursor:pointer;text-align:center}
 .btn-guasto:hover{background:#dc2626}
+.btn-mod{display:block;width:100%;margin-top:4px;padding:8px;background:#111827;color:#94a3b8;border:1px solid #374151;border-radius:6px;font-size:13px;font-weight:bold;cursor:pointer;text-align:center}
+.btn-mod:hover{background:#1e2d3d;color:#e2e8f0}
 /* Modale */
 #modal-overlay,#modal-modifica-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center}
 #modal-overlay.show,#modal-modifica-overlay.show{display:flex}
@@ -1477,6 +1493,31 @@ select,input[type=text]{padding:5px 8px;border:1px solid #374151;border-radius:6
 @keyframes spin{to{transform:rotate(360deg)}}
 .leaflet-tile{transform:translateZ(0);-webkit-transform:translateZ(0);-webkit-backface-visibility:hidden;backface-visibility:hidden}
 .leaflet-tile-pane{opacity:0.9999;transform:translateZ(0);-webkit-transform:translateZ(0);will-change:transform}
+/* ── Panel dark theme ─────────────────────────────────────── */
+#panel-body{background:#0d1117}
+#panel-body .fr{border-bottom-color:#131e2b}
+#panel-body .fl{color:#e2e8f0;font-size:12px;font-weight:400}
+#panel-body .fv{color:#e2e8f0}
+#panel-body .fv.empty{color:#334155}
+#panel-body .sec{background:#0a1e14;color:#4ade80;border-left-color:#22c55e}
+#panel-body .badge-cl{background:#162032;color:#60a5fa}
+#panel-body .badge-led{background:#0a2010;color:#4ade80}
+#panel-body .badge-qe{background:#1a1000;color:#fb923c}
+#panel-body .badge-com{background:#162032;color:#94a3b8;border-color:#1e2d3d}
+#panel-body .guasto-row{border-bottom-color:#131e2b}
+#panel-body .guasto-data{color:#e2e8f0}
+#panel-body .guasto-tipo{color:#94a3b8}
+#panel-body .guasto-note{color:#475569}
+#panel-body .no-guasti{color:#475569;font-style:italic}
+#panel-body img{border-color:#1e2d3d!important}
+/* Buttons uniform dark */
+#panel-body .btn-guasto,#panel-body .btn-enel,#panel-body .btn-hl,#panel-body .btn-sv,#panel-body .btn-nav,#panel-body .btn-mod{background:#111827;color:#e2e8f0;border:1px solid #2d3748;display:flex;align-items:center;justify-content:center;gap:7px}
+#panel-body .btn-guasto:hover,#panel-body .btn-enel:hover,#panel-body .btn-hl:hover,#panel-body .btn-sv:hover,#panel-body .btn-nav:hover,#panel-body .btn-mod:hover{background:#1e2d3d;color:#e2e8f0}
+/* tab body unified bg */
+.app-tab-body{background:#0d1117!important}
+.app-tab-body .fr{border-bottom-color:#131e2b}
+.app-tab-body .fl{color:#94a3b8}
+.app-tab-body .fv{color:#e2e8f0}
 </style>
 </head>
 <body>
@@ -1510,17 +1551,19 @@ select,input[type=text]{padding:5px 8px;border:1px solid #374151;border-radius:6
   <input type="text" id="search" placeholder="ID o indirizzo CL..." style="width:170px" onkeydown="if(event.key==='Enter')doSearch()">
   <button onclick="doSearch()" style="padding:5px 10px;background:#1f2937;color:white;border:none;border-radius:4px;cursor:pointer;font-size:13px;font-weight:bold">&#128269;</button>
   <button onclick="clearSearch()" style="padding:5px 8px;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:12px;background:white" title="Cancella">&#x2715;</button>
+  <span id="search-msg" style="display:none;color:#f87171;font-size:11px;font-weight:bold"></span>
   <div class="sep"></div>
   <button class="tbtn tbtn-cl on" id="btn-cl" onclick="toggleLayer('cl')">&#128262; CL</button>
   <button class="tbtn tbtn-qe on" id="btn-qe" onclick="toggleLayer('qe')">&#9889; QE</button>
   <button class="tbtn tbtn-sem on" id="btn-sem" onclick="toggleLayer('sem')">&#128676; SEM</button>
   <button class="tbtn tbtn-qesem on" id="btn-qesem" onclick="toggleLayer('qesem')">&#9711; QE-SEM</button>
   <button class="tbtn tbtn-guasti" id="btn-guasti" onclick="toggleGuasti()">&#128683; Guasti</button>
-  <button class="tbtn tbtn-geo" onclick="geolocate()" title="Dove sono">&#127759;</button>
-  <button id="btn-sat" onclick="toggleSat()" style="padding:4px 10px;border:none;border-radius:4px;cursor:pointer;font-size:12px;background:#1565c0;color:white;font-weight:bold">[ Satellite ]</button>
-  <button onclick="resetView()" style="padding:4px 8px;border:1px solid #999;border-radius:4px;cursor:pointer;font-size:12px;background:white">&#8635; Reset</button>
-  <button onclick="openStats()" style="padding:4px 10px;border:none;border-radius:4px;cursor:pointer;font-size:12px;background:#6a1b9a;color:white;font-weight:bold" title="Statistiche guasti">&#128202; Statistiche</button>
-  <a href="https://docs.google.com/spreadsheets/d/1T0Glf1EWjkO5xO_WxbXAGSverpqzU8wYKH8QWJbffB0/edit" target="_blank" style="padding:4px 10px;border:none;border-radius:4px;cursor:pointer;font-size:12px;background:#0f9d58;color:white;font-weight:bold;text-decoration:none">&#128196; Foglio Guasti</a>
+  <button class="tbtn tbtn-ante" id="btn-ante" onclick="toggleFiltroAnte()" title="Mostra solo punti luce con lampada ante operam (non ancora sostituita)">&#9201; Ante OP</button>
+  <button id="btn-sat" class="btn-topbar" onclick="toggleSat()">&#128752; Satellite</button>
+  <button onclick="resetView()" class="btn-topbar btn-reset-top">&#8635; Reset</button>
+  <button onclick="openStats()" class="btn-topbar btn-stat-top" title="Statistiche guasti">&#128202; Statistiche</button>
+  <a href="https://docs.google.com/spreadsheets/d/1T0Glf1EWjkO5xO_WxbXAGSverpqzU8wYKH8QWJbffB0/edit" target="_blank" class="btn-topbar btn-foglio-top">&#128196; Foglio Guasti</a>
+  <button class="tbtn-geo" onclick="geolocate()" title="Geolocalizzazione">&#127759;</button>
   <span id="counter"></span>
 </div>
 <!-- Modale registrazione guasto -->
@@ -1572,6 +1615,7 @@ select,input[type=text]{padding:5px 8px;border:1px solid #374151;border-radius:6
     </div>
     <div class="mfield"><label>Potenza (W)</label><input type="number" id="mod-potenza" min="0"></div>
     <div class="mfield"><label>Matricola</label><input type="text" id="mod-matricola"></div>
+    <div class="mfield"><label>QE alimentazione</label><input type="text" id="mod-qe" placeholder="es. 0010"></div>
     <div class="mfield"><label>Tecnico</label><input type="text" id="mod-tecnico" placeholder="Nome tecnico"></div>
     <div id="modal-modifica-status"></div>
     <div class="mbtn-row">
@@ -1685,6 +1729,7 @@ function updateGuastoMarkers() {
     if (n === 1) m.setIcon(mkIcon('#fbbf24', 16));
     else if (n === 2) m.setIcon(mkIcon('#f97316', 16));
     else if (n >= 3) m.setIcon(mkIcon('#ef4444', 16));
+    else if (modificheMap[m.data.id]) m.setIcon(iconModificato);
     else m.setIcon(m.isLED ? iconLED : iconAnte);
   });
 }
@@ -1710,7 +1755,7 @@ var _guastiCorrente = [];
 function guastiHistory(id_cl) {
   var list = guastiMap[id_cl] || [];
   _guastiCorrente = list.slice().reverse();
-  if (!list.length) return '<div style="font-size:12px;color:#aaa;padding:4px 0">Nessun guasto registrato</div>';
+  if (!list.length) return '<div class="no-guasti" style="font-size:12px;padding:4px 0">Nessun guasto registrato</div>';
   var html = '';
   _guastiCorrente.forEach(function(g, idx) {
     var risolto = g.stato === 'Risolto';
@@ -1787,6 +1832,7 @@ function showModificaForm() {
   document.getElementById('mod-sorgente').value  = d.sorgente_post || '';
   document.getElementById('mod-potenza').value   = d.taglia_post   || '';
   document.getElementById('mod-matricola').value = d.matricola_post|| '';
+  document.getElementById('mod-qe').value        = d.qe            || '';
   document.getElementById('mod-tecnico').value   = '';
   document.getElementById('modal-modifica-status').textContent = '';
   document.getElementById('modal-modifica-overlay').classList.add('show');
@@ -1804,11 +1850,13 @@ function submitModifica() {
   var sorgente  = document.getElementById('mod-sorgente').value;
   var potenza   = document.getElementById('mod-potenza').value.trim();
   var matricola = document.getElementById('mod-matricola').value.trim();
+  var nuovoQe   = document.getElementById('mod-qe').value.trim();
   if (marca)     campi.marca_post    = marca;
   if (modello)   campi.modello_post  = modello;
   if (sorgente)  campi.sorgente_post = sorgente;
   if (potenza)   campi.potenza_post  = potenza;
   if (matricola) campi.matricola     = matricola;
+  if (nuovoQe && nuovoQe !== _activeCL.qe) campi.qe = nuovoQe;
   if (Object.keys(campi).length === 0) {
     document.getElementById('modal-modifica-status').style.color = '#e74c3c';
     document.getElementById('modal-modifica-status').textContent = 'Nessun campo modificato.';
@@ -1823,8 +1871,22 @@ function submitModifica() {
   if (campi.sorgente_post) _activeCL.sorgente_post = campi.sorgente_post;
   if (campi.potenza_post)  _activeCL.taglia_post   = campi.potenza_post;
   if (campi.matricola)     _activeCL.matricola_post= campi.matricola;
+  if (campi.qe) {
+    var vecchiaKey = _activeCL.comune + '|' + _activeCL.qe;
+    var nuovaKey   = _activeCL.comune + '|' + campi.qe;
+    var marker = markersCL.find(function(m){ return m.data === _activeCL; });
+    if (marker && qeToCL[vecchiaKey]) {
+      qeToCL[vecchiaKey] = qeToCL[vecchiaKey].filter(function(m){ return m !== marker; });
+    }
+    if (marker) {
+      if (!qeToCL[nuovaKey]) qeToCL[nuovaKey] = [];
+      qeToCL[nuovaKey].push(marker);
+    }
+    _activeCL.qe = campi.qe;
+  }
   if (!modificheMap[_activeCL.id]) modificheMap[_activeCL.id] = {};
   Object.assign(modificheMap[_activeCL.id], campi);
+  updateGuastoMarkers();
   document.getElementById('modal-modifica-status').style.color = '#4caf50';
   document.getElementById('modal-modifica-status').textContent = 'Salvato!';
   setTimeout(function() {
@@ -1878,9 +1940,9 @@ function toggleSat(){
   if(mapMode===0){map.removeLayer(tileStreet);map.addLayer(tileSat);mapMode=1;}
   else if(mapMode===1){map.addLayer(tileHybrid);mapMode=2;}
   else{map.removeLayer(tileHybrid);map.removeLayer(tileSat);map.addLayer(tileStreet);mapMode=0;}
-  var labels=['[ Satellite ]','[ Ibrida ]','[ Mappa ]'];
-  var colors=['#1565c0','#00695c','#37474f'];
-  document.getElementById('btn-sat').textContent=labels[mapMode];
+  var labels=['&#128752; Satellite','&#127760; Ibrida','&#128506; Mappa'];
+  var colors=['#0d2040','#0a1e14','#111827'];
+  document.getElementById('btn-sat').innerHTML=labels[mapMode];
   document.getElementById('btn-sat').style.background=colors[mapMode];
 }
 
@@ -1899,6 +1961,7 @@ function mkIconQE(color,pulse){
 }
 const iconLED=mkIcon('#22c55e',16);
 const iconAnte=mkIcon('#3b82f6',16);
+const iconModificato=mkIcon('#a78bfa',17,'#6d28d9');
 const iconQE=mkIconQE('#f97316',false);
 const iconQEhl=mkIconQE('#e53935',true);
 // Icona semaforo: rombo viola
@@ -1930,6 +1993,7 @@ var vis={cl:true,qe:true,sem:true,qesem:true};
 var markersCL=[],markersQE=[],markersSEM=[],markersQESEM=[],qeToCL={},highlighted=[];
 var comuneAttivo='__tutti__';
 var _filtroGuasti = false;
+var _filtroAnte = false;
 
 var centri={};
 
@@ -2057,6 +2121,19 @@ function _enelUrl(d){
   return 'https://yourban.enelx.com/new-case?assetId='+encodeURIComponent(assetId);
 }
 
+function switchAppTab(t){
+  ['ante','post'].forEach(function(k){var el=document.getElementById('app-pane-'+k);if(el)el.style.display=k===t?'block':'none';});
+  var ba=document.getElementById('app-btn-ante'),bp=document.getElementById('app-btn-post');
+  if(ba)ba.className='app-tab'+(t==='ante'?' act-ante':'');
+  if(bp)bp.className='app-tab'+(t==='post'?' act-post':'');
+}
+function switchSostTab(t){
+  ['sost','linea'].forEach(function(k){var el=document.getElementById('sost-pane-'+k);if(el)el.style.display=k===t?'block':'none';});
+  var bs=document.getElementById('sost-btn-sost'),bl=document.getElementById('sost-btn-linea');
+  if(bs)bs.className='app-tab'+(t==='sost'?' act-post':'');
+  if(bl)bl.className='app-tab'+(t==='linea'?' act-post':'');
+}
+
 function openCL(d,m){
   _activeCL=d;
   document.getElementById('panel').style.display='flex';
@@ -2065,26 +2142,30 @@ function openCL(d,m){
   var nav='https://www.google.com/maps/dir/?api=1&destination='+d.lat+','+d.lon;
   var isLED=d.sorgente_post&&d.sorgente_post.toUpperCase().indexOf('LED')>=0;
   var bc=isLED?'badge-led':'badge-cl';
-  var post='';
-  if(d.marca_post||d.modello_post||d.sorgente_post||d.taglia_post){
-    post='<div class="sec post">&#9889; Apparecchio POST operam</div>'+f('Marca post',d.marca_post)+f('Modello post',d.modello_post)+f('Matricola',d.matricola_post)+f('Sorgente post',d.sorgente_post)+f('Taglia post (W)',d.taglia_post);
-  }
-  var qeBtn=d.qe?'<button class="btn-hl" onclick="goToCurrentQE()">&#9889; Vai al QE '+d.qe+'</button>':'';
-  var enelBtn='<a class="btn-enel" href="'+_enelUrl(d)+'" target="_blank" title="Verifica di avere selezionato il comune '+d.comune+' sul portale Enel">&#9888; Segnala guasto su Enel</a>';
+  var appSection='<div class="app-tabs"><button class="app-tab act-post" id="app-btn-post" onclick="switchAppTab(&apos;post&apos;)">Apparecchio</button><button class="app-tab" id="app-btn-ante" onclick="switchAppTab(&apos;ante&apos;)">Ante Operam</button></div><div class="app-tab-body"><div id="app-pane-post">'+f('Tipo apparecchio',d.app_tipo)+f('Sorgente luminosa',d.sorgente_post)+f('Potenza (W)',d.taglia_post)+f('Flusso (lm)',d.flusso_post||'')+f('Marca',d.marca_post)+f('Modello',d.modello_post)+f('Matricola',d.matricola_post)+f('Cat off',d.cutoff_post||'')+f('CCT (K)',d.cct_post||'')+'</div><div id="app-pane-ante" style="display:none">'+f('Tipo apparecchio',d.app_tipo)+f('Sorgente luminosa',d.sorgente)+f('Potenza (W)',d.potenza)+f('Flusso (lm)',d.flusso)+f('Marca',d.marca)+f('Modello',d.modello)+f('Cut-off',d.cutoff)+f('CCT (K)',d.cct)+'</div></div>';
+  var qeBtn=d.qe?'<button class="btn-hl" onclick="goToCurrentQE()"><span style="color:#f97316">&#9889;</span> Vai al QE '+d.qe+'</button>':'';
+  var enelBtn='<a class="btn-enel" href="'+_enelUrl(d)+'" target="_blank" title="Verifica di avere selezionato il comune '+d.comune+' sul portale Enel"><span style="color:#f59e0b">&#9888;</span> Segnala guasto su Enel</a>';
   var nGuasti=(guastiMap[d.id]||[]).length;
-  var guastoSection='<div class="sec">&#128683; Guasti registrati '+guastiBadge(d.id)+'</div>'+guastiHistory(d.id)+'<button class="btn-guasto" onclick="showGuastoForm()">+ Registra guasto</button><button class="btn-guasto" onclick="showModificaForm()" style="background:#1f2937;margin-top:4px">&#9998; Modifica dati PL</button>'+enelBtn;
+  var guastoSection='<div class="sec">&#128683; Guasti registrati '+guastiBadge(d.id)+'</div>'+guastiHistory(d.id)+'<button class="btn-guasto" onclick="showGuastoForm()"><span style="color:#ef4444;font-size:15px">+</span> Registra guasto</button><button class="btn-mod" onclick="showModificaForm()"><span style="color:#64748b">&#9998;</span> Modifica dati PL</button>'+enelBtn;
   _fotoUrl = d.foto || '';
   var fotoSection = d.foto ? '<div class="sec">&#128247; Fotografia</div><div style="text-align:center;margin:6px 0"><img id="foto-img-preview" src="'+d.foto+'" alt="Foto PL" style="max-width:100%;max-height:220px;border-radius:6px;border:1px solid #ddd;cursor:pointer" onclick="apriiFoto()" onerror="fotoErrore()"><div id="foto-fallback" style="display:none;margin-top:8px"><a href="" id="foto-fallback-link" target="_blank" style="display:inline-block;padding:10px 18px;background:#1f2937;color:#60a5fa;border:1px solid #374151;border-radius:8px;font-size:14px;text-decoration:none">&#128247; Apri foto nel browser</a></div></div>' : '';
+  var mod=modificheMap[d.id];
+  var bannerModifiche='';
+  if(mod){
+    var etichette={marca_post:'Marca',modello_post:'Modello',sorgente_post:'Sorgente',potenza_post:'Potenza',matricola:'Matricola',qe:'QE alimentazione'};
+    var campiMod=Object.keys(mod).filter(function(k){return etichette[k];}).map(function(k){return etichette[k]+': <b>'+mod[k]+'</b>';}).join(' &bull; ');
+    bannerModifiche='<div style="background:#2d1f00;border:1px solid #f59e0b;border-radius:6px;padding:7px 10px;margin-bottom:8px;font-size:11px;color:#fcd34d">&#9888; Dati modificati in sessione (non ancora su Excel) &mdash; '+campiMod+'</div>';
+  }
   document.getElementById('panel-body').innerHTML=
+    bannerModifiche+
     '<div><span class="badge '+bc+'">'+d.id+'</span><span class="badge-com">'+d.comune+'</span></div>'+
     f('Indirizzo',d.indirizzo)+f('Coordinate',d.lat.toFixed(6)+', '+d.lon.toFixed(6))+f('Proprieta',d.proprieta)+
     fotoSection+
-    '<div class="sec">Sostegno</div>'+f('Tipo installazione',d.inst)+f('Materiale',d.materiale)+f('Sezione',d.sezione)+f('Altezza (m)',d.altezza)+f('Braccio (m)',d.braccio)+
-    '<div class="sec">&#128262; Apparecchio ANTE operam</div>'+f('Tipo apparecchio',d.app_tipo)+f('Sorgente luminosa',d.sorgente)+f('Potenza (W)',d.potenza)+f('Flusso (lm)',d.flusso)+f('Marca',d.marca)+f('Modello',d.modello)+f('Cut-off',d.cutoff)+f('CCT (K)',d.cct)+
-    post+
+    '<div class="sec">Sostegno &amp; Linea</div><div class="app-tabs"><button class="app-tab act-post" id="sost-btn-sost" onclick="switchSostTab(&apos;sost&apos;)">Sostegno</button><button class="app-tab" id="sost-btn-linea" onclick="switchSostTab(&apos;linea&apos;)">Linea</button></div><div class="app-tab-body"><div id="sost-pane-sost">'+f('Tipo installazione',d.inst)+f('Materiale',d.materiale)+f('Sezione',d.sezione)+f('Altezza (m)',d.altezza)+f('Braccio (m)',d.braccio)+'</div><div id="sost-pane-linea" style="display:none">'+f('Tipologia linea',d.tipo_linea)+f('Linea QE ante',d.linea_ante)+f('Linea QE post',d.linea_post)+f('Pozzetto',d.pozzetto)+f('Classe isolamento',d.isolamento)+f('Messa a terra',d.messa_a_terra)+f('Tipo terreno',d.tipo_terreno)+f('Tipo cavo',d.tipo_cavo)+f('Note linea',d.note_linea)+'</div></div>'+
+    appSection+
     '<div class="sec">Alimentazione</div>'+f('QE pertinenza',d.qe)+f('Energia kWh/anno',d.energia)+f('Zona omogenea',d.zona)+
     guastoSection+
-    '<div class="btnrow"><a class="btn-sv" href="'+sv+'" target="_blank">&#128247; Street View</a><a class="btn-nav" href="'+nav+'" target="_blank">&#128205; Naviga</a></div>'+
+    '<div class="btnrow"><a class="btn-sv" href="'+sv+'" target="_blank"><span style="color:#93c5fd">&#128247;</span> Street View</a><a class="btn-nav" href="'+nav+'" target="_blank"><span style="color:#f87171">&#128205;</span> Naviga</a></div>'+
     qeBtn;
 }
 
@@ -2096,13 +2177,13 @@ function openQE(d,m){
   var nav='https://www.google.com/maps/dir/?api=1&destination='+d.lat+','+d.lon;
   var key=d.comune+'|'+d.id;
   var cl=qeToCL[key]||[];
-  var hlBtn=cl.length>0?'<button class="btn-hl" onclick="highlightCurrentCL()">&#128262; Evidenzia '+cl.length+' CL su mappa</button>':'';
+  var hlBtn=cl.length>0?'<button class="btn-hl" onclick="highlightCurrentCL()"><span style="color:#60a5fa">&#128262;</span> Evidenzia '+cl.length+' CL su mappa</button>':'';
   document.getElementById('panel-body').innerHTML=
     '<div><span class="badge badge-qe">'+d.id+'</span><span class="badge-com">'+d.comune+'</span></div>'+
     f('Indirizzo',d.indirizzo)+f('Coordinate',d.lat.toFixed(6)+', '+d.lon.toFixed(6))+f('Proprieta',d.proprieta)+
     '<div class="sec">Caratteristiche</div>'+f('Servizio',d.servizio)+f('Tipo installazione',d.inst)+f('Anno costruzione',d.anno)+f('Quadro misto',d.misto)+f('Carichi esogeni',d.carichi)+f('Accessibilita',d.accessibilita)+
     '<div class="sec">CL afferenti</div>'+f('N. punti luce',cl.length)+
-    '<div class="btnrow"><a class="btn-sv" href="'+sv+'" target="_blank">&#128247; Street View</a><a class="btn-nav" href="'+nav+'" target="_blank">&#128205; Naviga</a></div>'+
+    '<div class="btnrow"><a class="btn-sv" href="'+sv+'" target="_blank"><span style="color:#93c5fd">&#128247;</span> Street View</a><a class="btn-nav" href="'+nav+'" target="_blank"><span style="color:#f87171">&#128205;</span> Naviga</a></div>'+
     hlBtn;
 }
 
@@ -2123,7 +2204,7 @@ function openSEM(d,m){
     '<div class="sec">&#9889; Lanterna POST operam</div>'+f('Tipo lanterna post',d.tipo_post)+f('Marca',d.marca_post)+f('Modello',d.modello_post)+f('Matricola',d.matricola_post)+f('Sorgente post',d.sorgente_post)+f('Taglia post (W)',d.taglia_post)+
     '<div class="sec">Alimentazione</div>'+f('QE ante',d.qe)+f('QE post',d.qe_post)+f('Energia kWh post',d.energia_post)+
     guastoSection+
-    '<div class="btnrow"><a class="btn-sv" href="'+sv+'" target="_blank">&#128247; Street View</a><a class="btn-nav" href="'+nav+'" target="_blank">&#128205; Naviga</a></div>';
+    '<div class="btnrow"><a class="btn-sv" href="'+sv+'" target="_blank"><span style="color:#93c5fd">&#128247;</span> Street View</a><a class="btn-nav" href="'+nav+'" target="_blank"><span style="color:#f87171">&#128205;</span> Naviga</a></div>';
 }
 
 function openQESEM(d,m){
@@ -2216,19 +2297,20 @@ function applicaFiltroComune() {
   markersCL.forEach(function(m) {
     var show = comuneAttivo === '__tutti__' || m.data.comune === comuneAttivo;
     var haGuasto = _filtroGuasti ? (guastiMap[m.data.id]||[]).some(function(g){return g.stato!=='Risolto';}) : true;
-    m.setOpacity(show && haGuasto ? 1 : 0);
+    var passaAnte = _filtroAnte ? !m.isLED : true;
+    m.setOpacity(show && haGuasto && passaAnte ? 1 : 0);
   });
   markersQE.forEach(function(m) {
     var show = comuneAttivo === '__tutti__' || m.data.comune === comuneAttivo;
-    m.setOpacity(show && !_filtroGuasti && vis.qe ? 1 : 0);
+    m.setOpacity(show && !_filtroGuasti && !_filtroAnte && vis.qe ? 1 : 0);
   });
   markersSEM.forEach(function(m) {
     var show = comuneAttivo === '__tutti__' || m.data.comune === comuneAttivo;
-    m.setOpacity(show && !_filtroGuasti && vis.sem ? 1 : 0);
+    m.setOpacity(show && !_filtroGuasti && !_filtroAnte && vis.sem ? 1 : 0);
   });
   markersQESEM.forEach(function(m) {
     var show = comuneAttivo === '__tutti__' || m.data.comune === comuneAttivo;
-    m.setOpacity(show && !_filtroGuasti && vis.qesem ? 1 : 0);
+    m.setOpacity(show && !_filtroGuasti && !_filtroAnte && vis.qesem ? 1 : 0);
   });
 }
 function filtraComune(){
@@ -2297,6 +2379,15 @@ function applicaFiltroGuasti() {
       m.setOpacity(0);
     }
   });
+}
+function toggleFiltroAnte() {
+  _filtroAnte = !_filtroAnte;
+  document.getElementById('btn-ante').classList.toggle('on', _filtroAnte);
+  if (_filtroAnte) {
+    if (!vis.cl) { vis.cl = true; map.addLayer(layerCL); document.getElementById('btn-cl').classList.add('on'); }
+  }
+  applicaFiltroComune();
+  updateCounter();
 }
 function toggleLayer(type){
   vis[type]=!vis[type];
@@ -2394,6 +2485,11 @@ function doSearch(){
       _foundCL=found;
       found.setIcon(iconFound);
       setTimeout(function(){if(_foundCL===found){found.setIcon(found.isLED?iconLED:iconAnte);_foundCL=null;}},6000);
+    } else {
+      var msg=document.getElementById('search-msg');
+      msg.innerHTML='&#10060; ID non trovato';
+      msg.style.display='inline';
+      setTimeout(function(){msg.style.display='none';},2500);
     }
   }
 }
