@@ -1508,6 +1508,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 #draw-bar button:hover{background:#1e2d3d}
 #draw-bar .db-tool.on{background:#0e7490;border-color:#22d3ee;color:#fff}
 #draw-bar .db-stato{background:#3d1f08;border-color:#f97316;color:#fdba74}
+#draw-bar .db-gps{background:#134e4a;border-color:#14b8a6;color:#5eead4}
 #draw-bar .db-fine{background:#15803d;border-color:#22c55e;color:#fff}
 #draw-bar .db-close{background:#7f1d1d;border-color:#b91c1c;color:#fff}
 #draw-bar .db-count{color:#8b949e;font-size:12px;margin:0 2px}
@@ -1790,6 +1791,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
   <button id="draw-qe" class="db-tool" onclick="selezionaTool('qe')" title="Quadro elettrico (rettangolo)">&#9632; QE</button>
   <button id="draw-aerea" class="db-tool" onclick="selezionaTool('aerea')" title="Cavo aereo (linea continua)">&#9473; Aerea</button>
   <button id="draw-interrata" class="db-tool" onclick="selezionaTool('interrata')" title="Cavo interrato (linea tratteggiata)">&#183;&#183;&#183; Interrata</button>
+  <button class="db-gps" onclick="disegnaConGPS()" title="Posiziona alla tua posizione GPS">&#128205; Qui</button>
   <button id="draw-stato" class="db-stato" onclick="toggleStatoDisegno()" title="Alterna esistente/nuovo">&#128992; Nuovo</button>
   <button id="draw-fine" class="db-fine" onclick="fineLinea()" style="display:none">&#10003; Fine linea</button>
   <button id="draw-vis" class="db-sec" onclick="toggleVisibilitaDisegni()">&#128065; Visibili</button>
@@ -2043,6 +2045,9 @@ var last=ids[0],lastTs=-1;ids.forEach(function(id){if((disegni[id].ts||0)>=lastT
 function cancellaTuttiDisegni(){if(!Object.keys(disegni).length&&!_lineaInCorso){toastNota('Nessun disegno');return;}
 if(!confirm('Cancellare TUTTI i disegni?'))return;disegni={};_lineaInCorso=null;salvaDisegniStorage();renderDisegni();toastNota('Disegni cancellati');}
 function toggleVisibilitaDisegni(){_disegniVisibili=!_disegniVisibili;renderDisegni();}
+function disegnaConGPS(){if(!_disegnoTool){toastNota('Scegli prima uno strumento (PL, QE o linea)');return;}
+if(!navigator.geolocation){toastNota('GPS non disponibile');return;}
+toastNota('Rilevamento posizione GPS...');navigator.geolocation.getCurrentPosition(function(pos){var ll=[pos.coords.latitude,pos.coords.longitude];onMapClickDisegno({latlng:{lat:ll[0],lng:ll[1]}});map.setView(ll,Math.max(map.getZoom(),18));var acc=Math.round(pos.coords.accuracy||0);toastNota('Punto GPS aggiunto (±'+acc+' m)');},function(){toastNota('Impossibile ottenere la posizione GPS');},{enableHighAccuracy:true,timeout:10000,maximumAge:0});}
 function apriDisegno(){_disegnoAttivo=true;document.getElementById('draw-bar').classList.add('show');map.on('click',onMapClickDisegno);aggiornaBarraDisegno();}
 function chiudiDisegno(){_disegnoAttivo=false;_disegnoTool=null;if(_lineaInCorso)fineLinea();map.off('click',onMapClickDisegno);document.getElementById('draw-bar').classList.remove('show');renderDisegni();}
 function aggiornaBarraDisegno(){['pl','qe','aerea','interrata'].forEach(function(t){var b=document.getElementById('draw-'+t);if(b){if(_disegnoTool===t)b.classList.add('on');else b.classList.remove('on');}});var sb=document.getElementById('draw-stato');if(sb){sb.innerHTML=(_disegnoStato==='nuovo')?'&#128992; Nuovo':'&#128994; Esistente';}
