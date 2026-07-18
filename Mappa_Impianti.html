@@ -1456,8 +1456,13 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 .iv-close{background:#7f1d1d;color:#fff;border:none;border-radius:6px;padding:7px 12px;cursor:pointer;font-size:13px}
 .iv-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .iv-btn{border:none;border-radius:7px;padding:10px 16px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px}
+.iv-sync{background:#6d28d9;color:#fff}
+.iv-map{background:#be185d;color:#fff}
 .iv-print{background:#1d4ed8;color:#fff}
 .iv-csv{background:#047857;color:#fff}
+.iv-item{cursor:pointer;transition:border-color .12s,background .12s}
+.iv-item:hover{border-color:#ec4899;background:#141a24}
+.iv-item:hover .iv-id{color:#f9a8d4}
 .iv-empty{color:#94a3b8;font-style:italic;padding:26px;text-align:center;line-height:1.6}
 .iv-group{margin-bottom:18px}
 .iv-group h3{color:#4ade80;font-size:14px;margin:0 0 8px;border-bottom:1px solid #1e3a2a;padding-bottom:5px}
@@ -1708,6 +1713,8 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
       <button class="iv-close" onclick="closeInterventi()">&#x2715; Chiudi</button>
     </h2>
     <div class="iv-actions">
+      <button class="iv-btn iv-sync" id="iv-sync-btn" onclick="sincronizzaNote()" style="display:none">&#128260; Sincronizza NAS</button>
+      <button class="iv-btn iv-map" onclick="mostraInterventiSuMappa()">&#128205; Mostra sulla mappa</button>
       <button class="iv-btn iv-print" onclick="stampaInterventi()">&#128424; Stampa</button>
       <button class="iv-btn iv-csv" onclick="esportaInterventiCSV()">&#128190; Esporta CSV</button>
     </div>
@@ -1726,7 +1733,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
     <div id="panel-body"></div>
   </div>
 </div>
-<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;function noteKey(comune,id){return comune+'|'+id;}
+<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;function noteKey(comune,id){return comune+'|'+id;}
 function escHtml(s){return(''+(s==null?'':s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function escAttr(s){return escHtml(s).replace(/"/g,'&quot;');}
 function loadNote(){try{var s=localStorage.getItem('noteInterventi_v1');if(s)noteInterventi=JSON.parse(s)||{};}catch(e){noteInterventi={};}}
@@ -1737,17 +1744,28 @@ function addChipNota(btn){var ta=document.getElementById('nota-testo');if(!ta)re
 function salvaNota(){if(!_notaCurrent)return;var d=_notaCurrent.d,tipo=_notaCurrent.tipo;var ta=document.getElementById('nota-testo');if(!ta)return;var testo=ta.value.trim();var k=noteKey(d.comune,d.id);if(!testo)delete noteInterventi[k];else noteInterventi[k]={id:d.id,comune:d.comune,tipo:tipo,testo:testo,lat:d.lat,lon:d.lon,ts:Date.now()};salvaNoteStorage();updateGuastoMarkers();updateNoteLabels();toastNota(testo?'Nota salvata':'Nota rimossa');if(tipo==='QE')openQE(d);else openCL(d);}
 function rimuoviNota(){if(!_notaCurrent)return;var d=_notaCurrent.d,tipo=_notaCurrent.tipo;delete noteInterventi[noteKey(d.comune,d.id)];salvaNoteStorage();updateGuastoMarkers();updateNoteLabels();toastNota('Nota rimossa');if(tipo==='QE')openQE(d);else openCL(d);}
 var _toastTimer=null;function toastNota(msg){var t=document.getElementById('nota-toast');if(!t)return;t.textContent=msg;t.classList.add('show');if(_toastTimer)clearTimeout(_toastTimer);_toastTimer=setTimeout(function(){t.classList.remove('show');},1800);}
-var _noteLabelsOn=false;function noteLabelHtml(testo){return escHtml(testo).split(String.fromCharCode(10)).join('<br>');}
-function applicaNotaLabel(m){var n=noteInterventi[noteKey(m.data.comune,m.data.id)];if(_noteLabelsOn&&n){if(m.getTooltip())m.setTooltipContent(noteLabelHtml(n.testo));else m.bindTooltip(noteLabelHtml(n.testo),{permanent:true,direction:'top',offset:[0,-8],className:'nota-label',opacity:1});}else if(m.getTooltip()){m.unbindTooltip();}}
-function updateNoteLabels(){markersCL.forEach(applicaNotaLabel);markersQE.forEach(applicaNotaLabel);}
+var _noteLabelsOn=false;function plNumero(id){var mm=(''+id).match(/(\d+)/);return mm?String(parseInt(mm[1],10)):(''+id);}
+function noteLabelHtml(testo){return escHtml(testo).split(String.fromCharCode(10)).join('<br>');}
+function notaLabelFull(m,n){return'<b>'+escHtml(plNumero(m.data.id))+'</b><br>'+noteLabelHtml(n.testo);}
+function defaultTooltip(m,isQE){var content=isQE?('QE '+m.data.id):m.data.id;m.bindTooltip(content,{permanent:false,direction:'top',offset:[0,-8],className:isQE?'qe-tooltip':'cl-tooltip'});}
+function applicaNotaLabel(m,isQE){var n=noteInterventi[noteKey(m.data.comune,m.data.id)];var wantNota=!!(_noteLabelsOn&&n);if(wantNota){if(m._notaLabelOn){m.setTooltipContent(notaLabelFull(m,n));}
+else{m.unbindTooltip();m.bindTooltip(notaLabelFull(m,n),{permanent:true,direction:'top',offset:[0,-8],className:'nota-label',opacity:1});m._notaLabelOn=true;}}else if(m._notaLabelOn){m.unbindTooltip();defaultTooltip(m,isQE);m._notaLabelOn=false;}}
+function updateNoteLabels(){markersCL.forEach(function(m){applicaNotaLabel(m,false);});markersQE.forEach(function(m){applicaNotaLabel(m,true);});}
 function toggleNoteLabels(){_noteLabelsOn=!_noteLabelsOn;var b=document.getElementById('btn-notelabel');if(b){if(_noteLabelsOn)b.classList.add('on');else b.classList.remove('on');}
 updateNoteLabels();}
-var _ivListenerAdded=false;function openInterventi(){if(!_ivListenerAdded){document.getElementById('interventi-list').addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('.iv-del'):null;if(!b)return;var k=b.getAttribute('data-key');if(noteInterventi[k]){delete noteInterventi[k];salvaNoteStorage();updateGuastoMarkers();updateNoteLabels();renderInterventi();}});_ivListenerAdded=true;}
-renderInterventi();document.getElementById('interventi-overlay').classList.add('show');}
+var _ivListenerAdded=false;function openInterventi(){if(!_ivListenerAdded){document.getElementById('interventi-list').addEventListener('click',function(e){var del=e.target&&e.target.closest?e.target.closest('.iv-del'):null;if(del){var k=del.getAttribute('data-key');if(noteInterventi[k]){delete noteInterventi[k];salvaNoteStorage();updateGuastoMarkers();updateNoteLabels();renderInterventi();}return;}
+var item=e.target&&e.target.closest?e.target.closest('.iv-item'):null;if(item){vaiAIntervento(item.getAttribute('data-comune'),item.getAttribute('data-id'),item.getAttribute('data-tipo'),parseFloat(item.getAttribute('data-lat')),parseFloat(item.getAttribute('data-lon')));}});_ivListenerAdded=true;}
+var sb=document.getElementById('iv-sync-btn');if(sb)sb.style.display=SYNC_ENABLED?'':'none';renderInterventi();document.getElementById('interventi-overlay').classList.add('show');}
 function closeInterventi(){document.getElementById('interventi-overlay').classList.remove('show');}
+function vaiAIntervento(comune,id,tipo,lat,lon){closeInterventi();if(!_noteLabelsOn)toggleNoteLabels();function focus(){if(lat&&lon)map.setView([lat,lon],19);var arr=(tipo==='QE')?markersQE:markersCL;var m=arr.find(function(x){return x.data.comune===comune&&x.data.id===id;});if(m){if(tipo==='QE')openQE(m.data);else openCL(m.data);}}
+if(comune&&!_comuniCaricati[comune])caricaComune(comune,focus);else focus();}
+function mostraInterventiSuMappa(){var arr=_noteFiltrate();if(!arr.length){toastNota('Nessun intervento da mostrare');return;}
+closeInterventi();if(!_noteLabelsOn)toggleNoteLabels();var pts=arr.filter(function(n){return n.lat&&n.lon;}).map(function(n){return[n.lat,n.lon];});if(pts.length===1)map.setView(pts[0],18);else if(pts.length)map.fitBounds(pts,{padding:[60,60],maxZoom:18});}
+var _syncing=false;function sincronizzaNote(){if(!SYNC_ENABLED){toastNota('Sincronizzazione solo su app NAS');return;}
+if(_syncing)return;_syncing=true;toastNota('Sincronizzazione in corso...');fetch('/note',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(noteInterventi)}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(merged){if(merged&&merged.error)throw new Error(merged.error);noteInterventi=merged||{};salvaNoteStorage();updateGuastoMarkers();updateNoteLabels();renderInterventi();toastNota('Sincronizzato — '+Object.keys(noteInterventi).length+' note sul NAS');}).catch(function(e){toastNota('Errore sincronizzazione: '+e.message);}).then(function(){_syncing=false;});}
 function _noteFiltrate(){var com=comuneAttivo;var arr=Object.keys(noteInterventi).map(function(k){return noteInterventi[k];});if(com&&com!=='__tutti__')arr=arr.filter(function(n){return n.comune===com;});arr.sort(function(a,b){if(a.comune!==b.comune)return a.comune<b.comune?-1:1;return(''+a.id).localeCompare(''+b.id,undefined,{numeric:true});});return arr;}
 function renderInterventi(){var arr=_noteFiltrate();var box=document.getElementById('interventi-list');if(!arr.length){box.innerHTML='<div class="iv-empty">Nessuna nota registrata'+(comuneAttivo&&comuneAttivo!=='__tutti__'?' per <b>'+escHtml(comuneAttivo)+'</b>':'')+'.<br>Apri un punto luce o un quadro sulla mappa e scrivi una nota intervento.</div>';return;}
-var perCom={};arr.forEach(function(n){(perCom[n.comune]=perCom[n.comune]||[]).push(n);});var html='';Object.keys(perCom).forEach(function(com){var lista=perCom[com];html+='<div class="iv-group"><h3>'+escHtml(com)+' &mdash; '+lista.length+' intervent'+(lista.length===1?'o':'i')+'</h3>';lista.forEach(function(n){html+='<div class="iv-item"><span class="iv-tag '+(n.tipo==='QE'?'qe':'pl')+'">'+n.tipo+'</span>'+'<div class="iv-txt"><div class="iv-id">'+escHtml(''+n.id)+'</div>'+escHtml(n.testo)+'</div>'+'<button class="iv-del" title="Elimina" data-key="'+escAttr(n.comune+'|'+n.id)+'">&#128465;</button></div>';});html+='</div>';});box.innerHTML=html;}
+var perCom={};arr.forEach(function(n){(perCom[n.comune]=perCom[n.comune]||[]).push(n);});var html='';Object.keys(perCom).forEach(function(com){var lista=perCom[com];html+='<div class="iv-group"><h3>'+escHtml(com)+' &mdash; '+lista.length+' intervent'+(lista.length===1?'o':'i')+'</h3>';lista.forEach(function(n){html+='<div class="iv-item" title="Vai al punto sulla mappa" data-comune="'+escAttr(n.comune)+'" data-id="'+escAttr(''+n.id)+'" data-tipo="'+n.tipo+'" data-lat="'+(n.lat||'')+'" data-lon="'+(n.lon||'')+'"><span class="iv-tag '+(n.tipo==='QE'?'qe':'pl')+'">'+n.tipo+'</span>'+'<div class="iv-txt"><div class="iv-id">'+escHtml(''+n.id)+'</div>'+escHtml(n.testo)+'</div>'+'<button class="iv-del" title="Elimina" data-key="'+escAttr(n.comune+'|'+n.id)+'">&#128465;</button></div>';});html+='</div>';});box.innerHTML=html;}
 function stampaInterventi(){var arr=_noteFiltrate();if(!arr.length){toastNota('Nessuna nota da stampare');return;}
 var oggi=new Date().toLocaleDateString('it-IT');var titComune=(comuneAttivo&&comuneAttivo!=='__tutti__')?comuneAttivo:'Tutti i comuni';var rows='';var curCom=null;arr.forEach(function(n){if(n.comune!==curCom){curCom=n.comune;rows+='<tr class="grp"><td colspan="3">'+escHtml(curCom)+'</td></tr>';}
 rows+='<tr><td class="c-tipo">'+n.tipo+'</td><td class="c-id">'+escHtml(''+n.id)+'</td><td>'+escHtml(n.testo).split(String.fromCharCode(10)).join('<br>')+'</td></tr>';});var w=window.open('','_blank');if(!w){toastNota('Consenti i popup per stampare');return;}
