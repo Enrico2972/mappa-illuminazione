@@ -1501,6 +1501,17 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 #foto-lightbox.show{display:flex}
 #foto-lightbox img{max-width:100%;max-height:100%;border-radius:8px}
 #foto-lightbox .fl-close{position:absolute;top:14px;right:18px;color:#fff;font-size:30px;cursor:pointer;background:none;border:none;line-height:1}
+#draw-bar{display:none;position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:2500;background:#0d1117;border:1px solid #30363d;border-radius:12px;padding:8px 10px;box-shadow:0 6px 22px rgba(0,0,0,0.5);align-items:center;gap:6px;flex-wrap:wrap;max-width:96vw}
+#draw-bar.show{display:flex}
+#draw-bar .db-lab{color:#8b949e;font-size:12px;font-weight:600;margin-right:2px}
+#draw-bar button{border:1px solid #2d3748;background:#161b22;color:#e2e8f0;border-radius:7px;padding:7px 10px;font-size:12.5px;font-weight:600;cursor:pointer;line-height:1;white-space:nowrap}
+#draw-bar button:hover{background:#1e2d3d}
+#draw-bar .db-tool.on{background:#0e7490;border-color:#22d3ee;color:#fff}
+#draw-bar .db-stato{background:#3d1f08;border-color:#f97316;color:#fdba74}
+#draw-bar .db-fine{background:#15803d;border-color:#22c55e;color:#fff}
+#draw-bar .db-close{background:#7f1d1d;border-color:#b91c1c;color:#fff}
+#draw-bar .db-count{color:#8b949e;font-size:12px;margin:0 2px}
+#draw-bar .db-count b{color:#e2e8f0}
 #stats-overlay.show{display:block}
 #stats-inner{max-width:900px;margin:0 auto;padding:20px 16px 40px}
 #stats-inner h2{color:white;font-size:20px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
@@ -1608,6 +1619,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
   <button onclick="openStats()" class="btn-topbar btn-stat-top" title="Statistiche guasti">&#128202; Statistiche</button>
   <button onclick="openInterventi()" class="btn-topbar btn-stat-top" title="Elenco interventi da sopralluogo">&#128221; Interventi</button>
   <button class="tbtn tbtn-notelabel" id="btn-notelabel" onclick="toggleNoteLabels()" title="Mostra le note direttamente sulla mappa">&#127991; Etichette note</button>
+  <button class="btn-topbar btn-stat-top" onclick="apriDisegno()" title="Strumenti di disegno progetto">&#9998; Disegna</button>
   <a href="https://docs.google.com/spreadsheets/d/1T0Glf1EWjkO5xO_WxbXAGSverpqzU8wYKH8QWJbffB0/edit" target="_blank" class="btn-topbar btn-foglio-top">&#128196; Foglio Guasti</a>
   <button class="tbtn-geo" onclick="geolocate()" title="Geolocalizzazione">&#127759;</button>
   <span id="counter"></span>
@@ -1735,6 +1747,20 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 </div>
 <div id="nota-toast"></div>
 <div id="foto-lightbox" onclick="chiudiFoto()"><button class="fl-close" onclick="chiudiFoto()">&#10005;</button><img id="foto-lightbox-img" src="" alt="foto intervento"></div>
+<div id="draw-bar">
+  <span class="db-lab">Disegna:</span>
+  <button id="draw-pl" class="db-tool" onclick="selezionaTool('pl')" title="Punto luce (pallino)">&#9679; PL</button>
+  <button id="draw-qe" class="db-tool" onclick="selezionaTool('qe')" title="Quadro elettrico (rettangolo)">&#9632; QE</button>
+  <button id="draw-aerea" class="db-tool" onclick="selezionaTool('aerea')" title="Cavo aereo (linea continua)">&#9473; Aerea</button>
+  <button id="draw-interrata" class="db-tool" onclick="selezionaTool('interrata')" title="Cavo interrato (linea tratteggiata)">&#183;&#183;&#183; Interrata</button>
+  <button id="draw-stato" class="db-stato" onclick="toggleStatoDisegno()" title="Alterna esistente/nuovo">&#128992; Nuovo</button>
+  <button id="draw-fine" class="db-fine" onclick="fineLinea()" style="display:none">&#10003; Fine linea</button>
+  <button id="draw-vis" class="db-sec" onclick="toggleVisibilitaDisegni()">&#128065; Visibili</button>
+  <button class="db-sec" onclick="annullaUltimoDisegno()" title="Annulla ultimo">&#8630;</button>
+  <button class="db-sec" onclick="cancellaTuttiDisegni()" title="Cancella tutti">&#128465;</button>
+  <span class="db-count"><b id="draw-count">0</b> disegni</span>
+  <button class="db-close" onclick="chiudiDisegno()">&#10005; Chiudi</button>
+</div>
 
 <div id="main">
   <div id="map"></div>
@@ -1842,7 +1868,7 @@ const iconSEM=mkIconSEM(false);const iconSEMhl=mkIconSEM(true);const iconQESEM=m
 function setCLVisible(m,show){if(_clusteringEnabled){if(show){m.setOpacity(1);if(!layerCL.hasLayer(m))layerCL.addLayer(m);}else{if(layerCL.hasLayer(m))layerCL.removeLayer(m);}}
 else{m.setOpacity(show?1:0);}}
 function toggleCluster(){_clusteringEnabled=!_clusteringEnabled;document.getElementById('btn-cluster').classList.toggle('on',_clusteringEnabled);map.removeLayer(layerCL);layerCL=makeLayerCL();if(!_clusteringEnabled)markersCL.forEach(function(m){m.setOpacity(0);layerCL.addLayer(m);});if(vis.cl)layerCL.addTo(map);applicaFiltroComune();updateGuastoMarkers();}
-var layerCL=makeLayerCL().addTo(map);const layerQE=L.layerGroup().addTo(map);const layerSEM=L.layerGroup().addTo(map);const layerQESEM=L.layerGroup().addTo(map);var vis={cl:true,qe:true,sem:true,qesem:true};var markersCL=[],markersQE=[],markersSEM=[],markersQESEM=[],qeToCL={},highlighted=[];var comuneAttivo='__tutti__';var _filtroGuasti=false;var _filtroAnte=false;var centri={};function mostraSpinner(show,testo){var s=document.getElementById('loading-spinner');if(!s)return;s.style.display=show?'flex':'none';if(testo){var t=document.getElementById('spinner-text');if(t)t.textContent=testo;}}
+var layerCL=makeLayerCL().addTo(map);const layerQE=L.layerGroup().addTo(map);const layerSEM=L.layerGroup().addTo(map);const layerQESEM=L.layerGroup().addTo(map);var layerDisegni=L.layerGroup().addTo(map);var vis={cl:true,qe:true,sem:true,qesem:true};var markersCL=[],markersQE=[],markersSEM=[],markersQESEM=[],qeToCL={},highlighted=[];var comuneAttivo='__tutti__';var _filtroGuasti=false;var _filtroAnte=false;var centri={};function mostraSpinner(show,testo){var s=document.getElementById('loading-spinner');if(!s)return;s.style.display=show?'flex':'none';if(testo){var t=document.getElementById('spinner-text');if(t)t.textContent=testo;}}
 function creaMarkersComune(data){var comune=data.comune;if(data.centro)centri[comune]=data.centro;(data.cl||[]).forEach(function(d){var isLED=d.sorgente_post&&d.sorgente_post.toUpperCase().indexOf('LED')>=0;var m=L.marker([d.lat,d.lon],{icon:isLED?iconLED:iconAnte});m.data=d;m.isLED=isLED;m.bindTooltip(d.id,{permanent:false,direction:'top',offset:[0,-8],className:'cl-tooltip'});m.on('click',function(){openCL(d,m);});if(!_clusteringEnabled){m.setOpacity(0);layerCL.addLayer(m);}
 markersCL.push(m);if(d.qe){var k=d.comune+'|'+d.qe;if(!qeToCL[k])qeToCL[k]=[];qeToCL[k].push(m);}});(data.qe||[]).forEach(function(d){var m=L.marker([d.lat,d.lon],{icon:iconQE});m.data=d;m.bindTooltip('QE '+d.id,{permanent:false,direction:'top',offset:[0,-8],className:'qe-tooltip'});m.on('click',function(){openQE(d,m);});m.setOpacity(0);layerQE.addLayer(m);markersQE.push(m);});(data.sem||[]).forEach(function(d){var m=L.marker([d.lat,d.lon],{icon:iconSEM});m.data=d;m.bindTooltip(d.id,{permanent:false,direction:'top',offset:[0,-8],className:'sem-tooltip'});m.on('click',function(){openSEM(d,m);});m.setOpacity(0);layerSEM.addLayer(m);markersSEM.push(m);});(data.qe_sem||[]).forEach(function(d){var m=L.marker([d.lat,d.lon],{icon:iconQESEM});m.data=d;m.bindTooltip('QES '+d.id,{permanent:false,direction:'top',offset:[0,-8],className:'qe-tooltip'});m.on('click',function(){openQESEM(d,m);});m.setOpacity(0);layerQESEM.addLayer(m);markersQESEM.push(m);});_comuniCaricati[comune]=true;(data.cl||[]).forEach(function(d){var mod=modificheMap[d.id];if(!mod)return;markersCL.forEach(function(m){if(m.data.id!==d.id)return;if(mod.marca_post)m.data.marca_post=mod.marca_post;if(mod.modello_post)m.data.modello_post=mod.modello_post;if(mod.sorgente_post)m.data.sorgente_post=mod.sorgente_post;if(mod.potenza_post)m.data.taglia_post=mod.potenza_post;if(mod.matricola)m.data.matricola_post=mod.matricola;});});updateGuastoMarkers();updateNoteLabels();updateCounter();}
 function caricaComune(nome,callback){if(_comuniCaricati[nome]){if(callback)callback();return;}
@@ -1850,7 +1876,7 @@ var entry=null;for(var i=0;i<_comuniIndex.length;i++){if(_comuniIndex[i].nome===
 if(!entry){if(callback)callback();return;}
 mostraSpinner(true,'Caricamento '+nome+'...');fetch('dati_comuni/'+entry.file).then(function(r){return r.json();}).then(function(data){creaMarkersComune(data);mostraSpinner(false);if(callback)callback();}).catch(function(){mostraSpinner(false);alert('Errore caricamento: '+nome);});}
 function precaricaTutti(){_comuniIndex.forEach(function(entry){if(_comuniCaricati[entry.nome])return;fetch('dati_comuni/'+entry.file).then(function(r){return r.json();}).then(function(data){creaMarkersComune(data);}).catch(function(){});});}
-fetch('comuni_index.json').then(function(r){return r.json();}).then(function(idx){_comuniIndex=idx;var sel=document.getElementById('comune-sel');idx.forEach(function(c){var opt=document.createElement('option');opt.value=c.nome;opt.textContent=c.nome;sel.appendChild(opt);});loadNote();loadGuasti();var params=new URLSearchParams(window.location.search);var clId=params.get('cl');var clComune=params.get('comune');if(clComune&&clId){caricaComune(clComune,function(){handleDeepLink(clId,clComune);precaricaTutti();});}else{precaricaTutti();}}).catch(function(){console.error('comuni_index.json non trovato — rigenera la mappa');});function f(label,val){var v=(val&&val!==''&&val!=='-')?val:null;return'<div class="fr"><span class="fl">'+label+'</span><span class="fv'+(v?'':' empty')+'">'+(v||'&mdash;')+'</span></div>';}
+fetch('comuni_index.json').then(function(r){return r.json();}).then(function(idx){_comuniIndex=idx;var sel=document.getElementById('comune-sel');idx.forEach(function(c){var opt=document.createElement('option');opt.value=c.nome;opt.textContent=c.nome;sel.appendChild(opt);});loadNote();loadDisegni();renderDisegni();loadGuasti();var params=new URLSearchParams(window.location.search);var clId=params.get('cl');var clComune=params.get('comune');if(clComune&&clId){caricaComune(clComune,function(){handleDeepLink(clId,clComune);precaricaTutti();});}else{precaricaTutti();}}).catch(function(){console.error('comuni_index.json non trovato — rigenera la mappa');});function f(label,val){var v=(val&&val!==''&&val!=='-')?val:null;return'<div class="fr"><span class="fl">'+label+'</span><span class="fv'+(v?'':' empty')+'">'+(v||'&mdash;')+'</span></div>';}
 var _activeCL=null,_activeQE=null;function _enelUrl(d){var assetId=d.id.replace(/-\d+$/,'');return'https://yourban.enelx.com/new-case?assetId='+encodeURIComponent(assetId);}
 function switchAppTab(t){['ante','post'].forEach(function(k){var el=document.getElementById('app-pane-'+k);if(el)el.style.display=k===t?'block':'none';});var ba=document.getElementById('app-btn-ante'),bp=document.getElementById('app-btn-post');if(ba)ba.className='app-tab'+(t==='ante'?' act-ante':'');if(bp)bp.className='app-tab'+(t==='post'?' act-post':'');}
 function switchSostTab(t){['sost','linea'].forEach(function(k){var el=document.getElementById('sost-pane-'+k);if(el)el.style.display=k===t?'block':'none';});var bs=document.getElementById('sost-btn-sost'),bl=document.getElementById('sost-btn-linea');if(bs)bs.className='app-tab'+(t==='sost'?' act-post':'');if(bl)bl.className='app-tab'+(t==='linea'?' act-post':'');}
@@ -1933,6 +1959,32 @@ function card(num,lbl,sub,color){return'<div class="stat-card"><div class="num" 
 function handleDeepLink(clId,clComune){if(!clId)return;var found=null;markersCL.forEach(function(m){if(m.data.id===clId&&(!clComune||m.data.comune===clComune))found=m;});if(!found)markersCL.forEach(function(m){if(m.data.id===clId)found=m;});if(found){var sel=document.getElementById('comune-sel');if(sel)sel.value=found.data.comune;comuneAttivo=found.data.comune;applicaFiltroComune();updateCounter();map.setView(found.getLatLng(),18);found.setIcon(iconFound);openCL(found.data,found);}}
 var geoMarker=null;function geolocate(){if(!navigator.geolocation){alert('Geolocalizzazione non disponibile');return;}
 navigator.geolocation.getCurrentPosition(function(pos){var ll=[pos.coords.latitude,pos.coords.longitude];if(geoMarker)map.removeLayer(geoMarker);geoMarker=L.marker(ll,{icon:L.divIcon({className:'',html:'<div class="geo-dot"></div>',iconSize:[14,14],iconAnchor:[7,7]})}).addTo(map).bindPopup('&#127759; Sei qui').openPopup();map.setView(ll,16);},function(){alert('Impossibile ottenere la posizione');});}
+var disegni={};var _disegnoTool=null;var _disegnoStato='nuovo';var _lineaInCorso=null;var _disegniVisibili=true;var _disegnoAttivo=false;var DIS_COLORE={esistente:'#22c55e',nuovo:'#f97316'};function loadDisegni(){try{var s=localStorage.getItem('disegniProgetto_v1');if(s)disegni=JSON.parse(s)||{};}catch(e){disegni={};}}
+function salvaDisegniStorage(){try{localStorage.setItem('disegniProgetto_v1',JSON.stringify(disegni));}catch(e){}}
+function _newDisId(){return'd'+Date.now()+'_'+Math.floor(Math.random()*10000);}
+function disegnaElemento(el){var col=DIS_COLORE[el.stato]||DIS_COLORE.nuovo;var ov=null;if(el.tipo==='pl'){ov=L.circleMarker(el.punti[0],{radius:7,color:'#fff',weight:2,fillColor:col,fillOpacity:1});}else if(el.tipo==='qe'){ov=L.marker(el.punti[0],{icon:L.divIcon({className:'',html:'<div style="width:16px;height:16px;background:'+col+';border:2px solid #fff;border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.4)"></div>',iconSize:[16,16],iconAnchor:[8,8]})});}else if(el.tipo==='aerea'||el.tipo==='interrata'){ov=L.polyline(el.punti,{color:col,weight:4,opacity:0.9,dashArray:(el.tipo==='interrata'?'8,9':undefined)});}
+if(ov){ov._disId=el.id;ov.addTo(layerDisegni);}
+return ov;}
+function renderLineaInCorso(){if(!_lineaInCorso||!_lineaInCorso.punti.length)return;var col=DIS_COLORE[_lineaInCorso.stato]||DIS_COLORE.nuovo;L.polyline(_lineaInCorso.punti,{color:col,weight:4,opacity:0.55,dashArray:(_lineaInCorso.tipo==='interrata'?'8,9':undefined)}).addTo(layerDisegni);_lineaInCorso.punti.forEach(function(p){L.circleMarker(p,{radius:4,color:'#fff',weight:1,fillColor:col,fillOpacity:1}).addTo(layerDisegni);});}
+function renderDisegni(){if(!layerDisegni)return;layerDisegni.clearLayers();if(_disegniVisibili){Object.keys(disegni).forEach(function(id){disegnaElemento(disegni[id]);});}
+renderLineaInCorso();aggiornaBarraDisegno();}
+function selezionaTool(tool){if(_lineaInCorso&&tool!==_lineaInCorso.tipo)fineLinea();_disegnoTool=(_disegnoTool===tool)?null:tool;aggiornaBarraDisegno();}
+function toggleStatoDisegno(){_disegnoStato=(_disegnoStato==='nuovo')?'esistente':'nuovo';aggiornaBarraDisegno();}
+function onMapClickDisegno(e){if(!_disegnoTool)return;var ll=[e.latlng.lat,e.latlng.lng];if(_disegnoTool==='pl'||_disegnoTool==='qe'){var id=_newDisId();disegni[id]={id:id,tipo:_disegnoTool,stato:_disegnoStato,punti:[ll],nota:'',ts:Date.now()};salvaDisegniStorage();renderDisegni();}else{if(!_lineaInCorso)_lineaInCorso={tipo:_disegnoTool,stato:_disegnoStato,punti:[ll]};else _lineaInCorso.punti.push(ll);renderDisegni();}}
+function fineLinea(){if(_lineaInCorso&&_lineaInCorso.punti.length>=2){var id=_newDisId();disegni[id]={id:id,tipo:_lineaInCorso.tipo,stato:_lineaInCorso.stato,punti:_lineaInCorso.punti,nota:'',ts:Date.now()};salvaDisegniStorage();toastNota('Linea salvata');}
+_lineaInCorso=null;renderDisegni();}
+function annullaUltimoDisegno(){if(_lineaInCorso&&_lineaInCorso.punti.length){_lineaInCorso.punti.pop();if(!_lineaInCorso.punti.length)_lineaInCorso=null;renderDisegni();return;}
+var ids=Object.keys(disegni);if(!ids.length){toastNota('Nessun disegno');return;}
+var last=ids[0],lastTs=-1;ids.forEach(function(id){if((disegni[id].ts||0)>=lastTs){lastTs=disegni[id].ts||0;last=id;}});delete disegni[last];salvaDisegniStorage();renderDisegni();}
+function cancellaTuttiDisegni(){if(!Object.keys(disegni).length&&!_lineaInCorso){toastNota('Nessun disegno');return;}
+if(!confirm('Cancellare TUTTI i disegni?'))return;disegni={};_lineaInCorso=null;salvaDisegniStorage();renderDisegni();toastNota('Disegni cancellati');}
+function toggleVisibilitaDisegni(){_disegniVisibili=!_disegniVisibili;renderDisegni();}
+function apriDisegno(){_disegnoAttivo=true;document.getElementById('draw-bar').classList.add('show');map.on('click',onMapClickDisegno);aggiornaBarraDisegno();}
+function chiudiDisegno(){_disegnoAttivo=false;_disegnoTool=null;if(_lineaInCorso)fineLinea();map.off('click',onMapClickDisegno);document.getElementById('draw-bar').classList.remove('show');renderDisegni();}
+function aggiornaBarraDisegno(){['pl','qe','aerea','interrata'].forEach(function(t){var b=document.getElementById('draw-'+t);if(b){if(_disegnoTool===t)b.classList.add('on');else b.classList.remove('on');}});var sb=document.getElementById('draw-stato');if(sb){sb.innerHTML=(_disegnoStato==='nuovo')?'&#128992; Nuovo':'&#128994; Esistente';}
+var vb=document.getElementById('draw-vis');if(vb){vb.innerHTML=_disegniVisibili?'&#128065; Visibili':'&#128683; Nascosti';}
+var fb=document.getElementById('draw-fine');if(fb){fb.style.display=_lineaInCorso?'':'none';}
+var c=document.getElementById('draw-count');if(c){c.textContent=Object.keys(disegni).length;}}
 (function(){var sp=document.getElementById('splash');if(!sp)return;setTimeout(function(){sp.classList.add('fade-out');setTimeout(function(){sp.style.display='none';},850);},2500);sp.addEventListener('click',function(){sp.classList.add('fade-out');setTimeout(function(){sp.style.display='none';},850);});})();</script>
 </body>
 </html>
