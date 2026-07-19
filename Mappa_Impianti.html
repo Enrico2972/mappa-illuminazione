@@ -1484,7 +1484,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 .btn-nota-del{background:#111827;color:#fca5a5;border:1px solid #7f1d1d;border-radius:6px;padding:9px 12px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px}
 #nota-toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#15803d;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;z-index:5000;box-shadow:0 4px 14px rgba(0,0,0,0.4);opacity:0;transition:opacity .25s;pointer-events:none}
 #nota-toast.show{opacity:1}
-.nota-label{background:#831843;color:#fff;border:1px solid #ec4899;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;line-height:1.35;max-width:190px;white-space:normal;box-shadow:0 2px 7px rgba(0,0,0,0.45)}
+.nota-label{background:#831843;color:#fff;border:1px solid #ec4899;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;line-height:1.35;width:-webkit-max-content;width:max-content;max-width:200px;white-space:normal;text-align:center;box-shadow:0 2px 7px rgba(0,0,0,0.45)}
 .leaflet-tooltip-top.nota-label:before{border-top-color:#ec4899}
 .leaflet-tooltip-bottom.nota-label:before{border-bottom-color:#ec4899}
 .leaflet-tooltip-left.nota-label:before{border-left-color:#ec4899}
@@ -1872,10 +1872,10 @@ function apriFoto(u){document.getElementById('foto-lightbox-img').src=u;document
 function chiudiFoto(){document.getElementById('foto-lightbox').classList.remove('show');document.getElementById('foto-lightbox-img').src='';}
 var _noteLabelsOn=false;function plNumero(id){var mm=(''+id).match(/(\d+)/);return mm?String(parseInt(mm[1],10)):(''+id);}
 function noteLabelHtml(testo){return escHtml(testo).split(String.fromCharCode(10)).join('<br>');}
-function notaLabelFull(m,n){return'<b>'+escHtml(plNumero(m.data.id))+'</b><br>'+noteLabelHtml(n.testo);}
+function notaLabelFull(m,n,isQE){return'<b>'+(isQE?'QE ':'PL ')+escHtml(plNumero(m.data.id))+'</b><br>'+noteLabelHtml(n.testo);}
 function defaultTooltip(m,isQE){var content=isQE?('QE '+m.data.id):m.data.id;m.bindTooltip(content,{permanent:false,direction:'top',offset:[0,-8],className:isQE?'qe-tooltip':'cl-tooltip'});}
-function applicaNotaLabel(m,isQE){var n=noteInterventi[noteKey(m.data.comune,m.data.id)];var wantNota=!!(_noteLabelsOn&&n);if(wantNota){if(m._notaLabelOn){m.setTooltipContent(notaLabelFull(m,n));}
-else{m.unbindTooltip();m.bindTooltip(notaLabelFull(m,n),{permanent:true,direction:'top',offset:[0,-8],className:'nota-label',opacity:1});m._notaLabelOn=true;}}else if(m._notaLabelOn){m.unbindTooltip();defaultTooltip(m,isQE);m._notaLabelOn=false;}}
+function applicaNotaLabel(m,isQE){var n=noteInterventi[noteKey(m.data.comune,m.data.id)];var wantNota=!!(_noteLabelsOn&&n);if(wantNota){if(m._notaLabelOn){m.setTooltipContent(notaLabelFull(m,n,isQE));}
+else{m.unbindTooltip();m.bindTooltip(notaLabelFull(m,n,isQE),{permanent:true,direction:'top',offset:[0,-8],className:'nota-label',opacity:1});m._notaLabelOn=true;}}else if(m._notaLabelOn){m.unbindTooltip();defaultTooltip(m,isQE);m._notaLabelOn=false;}}
 function updateNoteLabels(){markersCL.forEach(function(m){applicaNotaLabel(m,false);});markersQE.forEach(function(m){applicaNotaLabel(m,true);});}
 function toggleNoteLabels(){_noteLabelsOn=!_noteLabelsOn;var b=document.getElementById('btn-notelabel');if(b){if(_noteLabelsOn)b.classList.add('on');else b.classList.remove('on');}
 updateNoteLabels();}
