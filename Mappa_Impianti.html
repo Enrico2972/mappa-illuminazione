@@ -1464,6 +1464,13 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 .iv-item:hover{border-color:#ec4899;background:#141a24}
 .iv-item:hover .iv-id{color:#f9a8d4}
 .iv-empty{color:#94a3b8;font-style:italic;padding:26px;text-align:center;line-height:1.6}
+#interventi-gruppi{margin-bottom:14px}
+.gr-tit{color:#8b949e;font-size:12px;font-weight:600;margin-bottom:6px}
+.gr-item{background:#0d1117;border:1px solid #1e2d3d;border-radius:8px;padding:7px 10px;margin-bottom:6px;display:flex;gap:9px;align-items:center}
+.gr-n{background:#1e3a5f;color:#93c5fd;font-size:11px;font-weight:700;border-radius:10px;padding:2px 8px;flex-shrink:0}
+.gr-t{flex:1;color:#e2e8f0;font-size:12.5px;word-break:break-word}
+.gr-ed{background:#1d4ed8;color:#fff;border:none;border-radius:6px;padding:5px 9px;cursor:pointer;font-size:12px;flex-shrink:0;white-space:nowrap}
+.gr-ed:hover{background:#2563eb}
 .iv-group{margin-bottom:18px}
 .iv-group h3{color:#4ade80;font-size:14px;margin:0 0 8px;border-bottom:1px solid #1e3a2a;padding-bottom:5px}
 .iv-item{background:#0d1117;border:1px solid #1e2d3d;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start}
@@ -1783,6 +1790,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
       <button class="iv-btn iv-print" onclick="stampaInterventi()">&#128424; Stampa</button>
       <button class="iv-btn iv-csv" onclick="esportaInterventiCSV()">&#128190; Esporta CSV</button>
     </div>
+    <div id="interventi-gruppi"></div>
     <div id="interventi-list"></div>
   </div>
 </div>
@@ -1872,7 +1880,7 @@ function apriFoto(u){document.getElementById('foto-lightbox-img').src=u;document
 function chiudiFoto(){document.getElementById('foto-lightbox').classList.remove('show');document.getElementById('foto-lightbox-img').src='';}
 var _noteLabelsOn=false;function plNumero(id){var mm=(''+id).match(/(\d+)/);return mm?String(parseInt(mm[1],10)):(''+id);}
 function noteLabelHtml(testo){return escHtml(testo).split(String.fromCharCode(10)).join('<br>');}
-function notaLabelFull(m,n,isQE){return'<b>'+(isQE?'QE ':'PL ')+escHtml(plNumero(m.data.id))+'</b><br>'+noteLabelHtml(n.testo);}
+function notaLabelFull(m,n,isQE){var cam=(n.foto&&n.foto.length)?'&#128247; ':'';return'<b>'+(isQE?'QE ':'PL ')+escHtml(plNumero(m.data.id))+'</b><br>'+cam+noteLabelHtml(n.testo);}
 function defaultTooltip(m,isQE){var content=isQE?('QE '+m.data.id):m.data.id;m.bindTooltip(content,{permanent:false,direction:'top',offset:[0,-8],className:isQE?'qe-tooltip':'cl-tooltip'});}
 function applicaNotaLabel(m,isQE){var n=noteInterventi[noteKey(m.data.comune,m.data.id)];var wantNota=!!(_noteLabelsOn&&n);if(wantNota){if(m._notaLabelOn){m.setTooltipContent(notaLabelFull(m,n,isQE));}
 else{m.unbindTooltip();m.bindTooltip(notaLabelFull(m,n,isQE),{permanent:true,direction:'top',offset:[0,-8],className:'nota-label',opacity:1});m._notaLabelOn=true;}}else if(m._notaLabelOn){m.unbindTooltip();defaultTooltip(m,isQE);m._notaLabelOn=false;}}
@@ -1880,7 +1888,7 @@ function updateNoteLabels(){markersCL.forEach(function(m){applicaNotaLabel(m,fal
 function toggleNoteLabels(){_noteLabelsOn=!_noteLabelsOn;var b=document.getElementById('btn-notelabel');if(b){if(_noteLabelsOn)b.classList.add('on');else b.classList.remove('on');}
 updateNoteLabels();}
 var _ivListenerAdded=false;function openInterventi(){if(!_ivListenerAdded){document.getElementById('interventi-list').addEventListener('click',function(e){var del=e.target&&e.target.closest?e.target.closest('.iv-del'):null;if(del){var k=del.getAttribute('data-key');if(noteInterventi[k]){delete noteInterventi[k];salvaNoteStorage();updateGuastoMarkers();updateNoteLabels();renderInterventi();}return;}
-var item=e.target&&e.target.closest?e.target.closest('.iv-item'):null;if(item){vaiAIntervento(item.getAttribute('data-comune'),item.getAttribute('data-id'),item.getAttribute('data-tipo'),parseFloat(item.getAttribute('data-lat')),parseFloat(item.getAttribute('data-lon')));}});_ivListenerAdded=true;}
+var item=e.target&&e.target.closest?e.target.closest('.iv-item'):null;if(item){vaiAIntervento(item.getAttribute('data-comune'),item.getAttribute('data-id'),item.getAttribute('data-tipo'),parseFloat(item.getAttribute('data-lat')),parseFloat(item.getAttribute('data-lon')));}});document.getElementById('interventi-gruppi').addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('.gr-ed'):null;if(b){modificaTestoGruppo(b.getAttribute('data-testo'));}});_ivListenerAdded=true;}
 var sb=document.getElementById('iv-sync-btn');if(sb)sb.style.display=SYNC_ENABLED?'':'none';renderInterventi();document.getElementById('interventi-overlay').classList.add('show');}
 function closeInterventi(){document.getElementById('interventi-overlay').classList.remove('show');}
 function vaiAIntervento(comune,id,tipo,lat,lon){closeInterventi();if(!_noteLabelsOn)toggleNoteLabels();function focus(){if(lat&&lon)map.setView([lat,lon],19);var arr=(tipo==='QE')?markersQE:markersCL;var m=arr.find(function(x){return x.data.comune===comune&&x.data.id===id;});if(m){if(tipo==='QE')openQE(m.data);else openCL(m.data);}}
@@ -1890,8 +1898,13 @@ closeInterventi();if(!_noteLabelsOn)toggleNoteLabels();var pts=arr.filter(functi
 var _syncing=false;function sincronizzaNote(){if(!SYNC_ENABLED){toastNota('Sincronizzazione solo su app NAS');return;}
 if(_syncing)return;_syncing=true;toastNota('Sincronizzazione in corso...');fetch('/note',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(noteInterventi)}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(merged){if(merged&&merged.error)throw new Error(merged.error);noteInterventi=merged||{};salvaNoteStorage();updateGuastoMarkers();updateNoteLabels();renderInterventi();toastNota('Sincronizzato — '+Object.keys(noteInterventi).length+' note sul NAS');}).catch(function(e){toastNota('Errore sincronizzazione: '+e.message);}).then(function(){_syncing=false;});}
 function _noteFiltrate(){var com=comuneAttivo;var arr=Object.keys(noteInterventi).map(function(k){return noteInterventi[k];});if(com&&com!=='__tutti__')arr=arr.filter(function(n){return n.comune===com;});arr.sort(function(a,b){if(a.comune!==b.comune)return a.comune<b.comune?-1:1;return(''+a.id).localeCompare(''+b.id,undefined,{numeric:true});});return arr;}
-function renderInterventi(){var arr=_noteFiltrate();var box=document.getElementById('interventi-list');if(!arr.length){box.innerHTML='<div class="iv-empty">Nessuna nota registrata'+(comuneAttivo&&comuneAttivo!=='__tutti__'?' per <b>'+escHtml(comuneAttivo)+'</b>':'')+'.<br>Apri un punto luce o un quadro sulla mappa e scrivi una nota intervento.</div>';return;}
+function renderInterventi(){var arr=_noteFiltrate();var box=document.getElementById('interventi-list');renderGruppiNote();if(!arr.length){box.innerHTML='<div class="iv-empty">Nessuna nota registrata'+(comuneAttivo&&comuneAttivo!=='__tutti__'?' per <b>'+escHtml(comuneAttivo)+'</b>':'')+'.<br>Apri un punto luce o un quadro sulla mappa e scrivi una nota intervento.</div>';return;}
 var perCom={};arr.forEach(function(n){(perCom[n.comune]=perCom[n.comune]||[]).push(n);});var html='';Object.keys(perCom).forEach(function(com){var lista=perCom[com];html+='<div class="iv-group"><h3>'+escHtml(com)+' &mdash; '+lista.length+' intervent'+(lista.length===1?'o':'i')+'</h3>';lista.forEach(function(n){html+='<div class="iv-item" title="Vai al punto sulla mappa" data-comune="'+escAttr(n.comune)+'" data-id="'+escAttr(''+n.id)+'" data-tipo="'+n.tipo+'" data-lat="'+(n.lat||'')+'" data-lon="'+(n.lon||'')+'"><span class="iv-tag '+(n.tipo==='QE'?'qe':'pl')+'">'+n.tipo+'</span>'+'<div class="iv-txt"><div class="iv-id">'+escHtml(''+n.id)+'</div>'+escHtml(n.testo)+fotoIvHtml(n)+'</div>'+'<button class="iv-del" title="Elimina" data-key="'+escAttr(n.comune+'|'+n.id)+'">&#128465;</button></div>';});html+='</div>';});box.innerHTML=html;}
+function raggruppaNote(){var arr=_noteFiltrate();var g={};arr.forEach(function(n){var t=(n.testo||'').trim();if(!t)return;(g[t]=g[t]||[]).push(n);});return g;}
+function renderGruppiNote(){var box=document.getElementById('interventi-gruppi');if(!box)return;var g=raggruppaNote();var chiavi=Object.keys(g).filter(function(t){return g[t].length>1;});if(!chiavi.length){box.innerHTML='';return;}
+chiavi.sort(function(a,b){return g[b].length-g[a].length;});var html='<div class="gr-tit">&#9998; Diciture ricorrenti &mdash; modificale tutte in una volta</div>';chiavi.forEach(function(t){html+='<div class="gr-item"><span class="gr-n">'+g[t].length+'</span><span class="gr-t">'+escHtml(t)+'</span><button class="gr-ed" data-testo="'+escAttr(t)+'" title="Modifica tutte queste note">&#9998; Modifica</button></div>';});box.innerHTML=html;}
+function modificaTestoGruppo(vecchio){var g=raggruppaNote();var lista=g[vecchio];if(!lista||!lista.length)return;var nuovo=prompt('Nuova dicitura per le '+lista.length+' note con questo testo:',vecchio);if(nuovo===null)return;nuovo=(nuovo||'').trim();if(!nuovo){toastNota('Dicitura non modificata');return;}
+lista.forEach(function(n){var k=noteKey(n.comune,n.id);if(noteInterventi[k]){noteInterventi[k].testo=nuovo;noteInterventi[k].ts=Date.now();}});salvaNoteStorage();updateGuastoMarkers();updateNoteLabels();renderInterventi();toastNota(lista.length+' note aggiornate');}
 function stampaInterventi(){var arr=_noteFiltrate();if(!arr.length){toastNota('Nessuna nota da stampare');return;}
 var oggi=new Date().toLocaleDateString('it-IT');var titComune=(comuneAttivo&&comuneAttivo!=='__tutti__')?comuneAttivo:'Tutti i comuni';var rows='';var curCom=null;arr.forEach(function(n){if(n.comune!==curCom){curCom=n.comune;rows+='<tr class="grp"><td colspan="3">'+escHtml(curCom)+'</td></tr>';}
 var fp=(n.foto&&n.foto.length)?('<div class="foto-print">'+n.foto.map(function(u){return'<img src="'+escAttr(location.origin+u)+'">';}).join('')+'</div>'):'';rows+='<tr><td class="c-tipo">'+n.tipo+'</td><td class="c-id">'+escHtml(''+n.id)+'</td><td>'+escHtml(n.testo).split(String.fromCharCode(10)).join('<br>')+fp+'</td></tr>';});var w=window.open('','_blank');if(!w){toastNota('Consenti i popup per stampare');return;}
@@ -2040,7 +2053,7 @@ function _newDisId(){return'd'+Date.now()+'_'+Math.floor(Math.random()*10000);}
 function _idsProgetto(){return Object.keys(disegni).filter(function(id){return disegni[id].progetto===_progettoAttivo;});}
 function loadProgetti(){try{var s=localStorage.getItem('progettiDisegno_v1');if(s)progetti=JSON.parse(s)||{};}catch(e){progetti={};}}
 function salvaProgetti(){try{localStorage.setItem('progettiDisegno_v1',JSON.stringify(progetti));}catch(e){}}
-function _migraProgetti(){if(!Object.keys(progetti).length){var pid=_newDisId();progetti[pid]={id:pid,nome:'Progetto 1',ts:Date.now()};salvaProgetti();_progettoAttivo=pid;}
+function _migraProgetti(){if(!Object.keys(progetti).length){var pid='prog_default';progetti[pid]={id:pid,nome:'Progetto 1',ts:Date.now()};salvaProgetti();_progettoAttivo=pid;}
 if(!_progettoAttivo||!progetti[_progettoAttivo])_progettoAttivo=Object.keys(progetti)[0];var orfani=Object.keys(disegni).filter(function(id){return!disegni[id].progetto||!progetti[disegni[id].progetto];});if(orfani.length){orfani.forEach(function(id){disegni[id].progetto=_progettoAttivo;});salvaDisegniStorage();}}
 function populaSelettoreProgetti(){var sel=document.getElementById('draw-prog-sel');if(!sel)return;sel.innerHTML='';Object.keys(progetti).forEach(function(pid){var o=document.createElement('option');o.value=pid;o.textContent=progetti[pid].nome;if(pid===_progettoAttivo)o.selected=true;sel.appendChild(o);});}
 function nuovoProgetto(){var nome=prompt('Nome del nuovo progetto / preventivo:','');if(nome===null)return;nome=(nome||'').trim()||('Progetto '+(Object.keys(progetti).length+1));var pid=_newDisId();progetti[pid]={id:pid,nome:nome,ts:Date.now()};salvaProgetti();_progettoAttivo=pid;populaSelettoreProgetti();renderDisegni();toastNota('Progetto creato: '+nome);}
