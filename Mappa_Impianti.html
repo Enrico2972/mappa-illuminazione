@@ -1464,6 +1464,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 .iv-item:hover{border-color:#ec4899;background:#141a24}
 .iv-item:hover .iv-id{color:#f9a8d4}
 .iv-empty{color:#94a3b8;font-style:italic;padding:26px;text-align:center;line-height:1.6}
+.build-ver{color:#64748b;font-size:10px;margin-left:6px;white-space:nowrap}
 #interventi-gruppi{margin-bottom:14px}
 .gr-tit{color:#8b949e;font-size:12px;font-weight:600;margin-bottom:6px}
 .gr-item{background:#0d1117;border:1px solid #1e2d3d;border-radius:8px;padding:7px 10px;margin-bottom:6px;display:flex;gap:9px;align-items:center}
@@ -1671,6 +1672,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
   <a href="https://docs.google.com/spreadsheets/d/1T0Glf1EWjkO5xO_WxbXAGSverpqzU8wYKH8QWJbffB0/edit" target="_blank" class="btn-topbar btn-foglio-top">&#128196; Foglio Guasti</a>
   <button class="tbtn-geo" onclick="geolocate()" title="Geolocalizzazione">&#127759;</button>
   <span id="counter"></span>
+  <span id="build-ver" class="build-ver" title="Versione del programma installata"></span>
 </div>
 <!-- Modale registrazione guasto -->
 <div id="modal-overlay">
@@ -1855,7 +1857,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
     <div id="panel-body"></div>
   </div>
 </div>
-<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;function noteKey(comune,id){return comune+'|'+id;}
+<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='22/07 01:36';function noteKey(comune,id){return comune+'|'+id;}
 function _tomba(){return{del:true,ts:Date.now()};}
 function _vivo(o){return!!o&&!o.del;}
 function _chiaviVive(obj){return Object.keys(obj).filter(function(k){return _vivo(obj[k]);});}
@@ -1967,7 +1969,7 @@ var entry=null;for(var i=0;i<_comuniIndex.length;i++){if(_comuniIndex[i].nome===
 if(!entry){if(callback)callback();return;}
 mostraSpinner(true,'Caricamento '+nome+'...');fetch('dati_comuni/'+entry.file).then(function(r){return r.json();}).then(function(data){creaMarkersComune(data);mostraSpinner(false);if(callback)callback();}).catch(function(){mostraSpinner(false);alert('Errore caricamento: '+nome);});}
 function precaricaTutti(){_comuniIndex.forEach(function(entry){if(_comuniCaricati[entry.nome])return;fetch('dati_comuni/'+entry.file).then(function(r){return r.json();}).then(function(data){creaMarkersComune(data);}).catch(function(){});});}
-fetch('comuni_index.json').then(function(r){return r.json();}).then(function(idx){_comuniIndex=idx;var sel=document.getElementById('comune-sel');idx.forEach(function(c){var opt=document.createElement('option');opt.value=c.nome;opt.textContent=c.nome;sel.appendChild(opt);});loadNote();loadDisegni();loadProgetti();_migraProgetti();renderDisegni();loadGuasti();var params=new URLSearchParams(window.location.search);var clId=params.get('cl');var clComune=params.get('comune');if(clComune&&clId){caricaComune(clComune,function(){handleDeepLink(clId,clComune);precaricaTutti();});}else{precaricaTutti();}}).catch(function(){console.error('comuni_index.json non trovato — rigenera la mappa');});function f(label,val){var v=(val&&val!==''&&val!=='-')?val:null;return'<div class="fr"><span class="fl">'+label+'</span><span class="fv'+(v?'':' empty')+'">'+(v||'&mdash;')+'</span></div>';}
+fetch('comuni_index.json').then(function(r){return r.json();}).then(function(idx){_comuniIndex=idx;var sel=document.getElementById('comune-sel');idx.forEach(function(c){var opt=document.createElement('option');opt.value=c.nome;opt.textContent=c.nome;sel.appendChild(opt);});var bv=document.getElementById('build-ver');if(bv)bv.textContent='v '+BUILD_VER;loadNote();loadDisegni();loadProgetti();_migraProgetti();renderDisegni();loadGuasti();var params=new URLSearchParams(window.location.search);var clId=params.get('cl');var clComune=params.get('comune');if(clComune&&clId){caricaComune(clComune,function(){handleDeepLink(clId,clComune);precaricaTutti();});}else{precaricaTutti();}}).catch(function(){console.error('comuni_index.json non trovato — rigenera la mappa');});function f(label,val){var v=(val&&val!==''&&val!=='-')?val:null;return'<div class="fr"><span class="fl">'+label+'</span><span class="fv'+(v?'':' empty')+'">'+(v||'&mdash;')+'</span></div>';}
 var _activeCL=null,_activeQE=null;function _enelUrl(d){var assetId=d.id.replace(/-\d+$/,'');return'https://yourban.enelx.com/new-case?assetId='+encodeURIComponent(assetId);}
 function switchAppTab(t){['ante','post'].forEach(function(k){var el=document.getElementById('app-pane-'+k);if(el)el.style.display=k===t?'block':'none';});var ba=document.getElementById('app-btn-ante'),bp=document.getElementById('app-btn-post');if(ba)ba.className='app-tab'+(t==='ante'?' act-ante':'');if(bp)bp.className='app-tab'+(t==='post'?' act-post':'');}
 function switchSostTab(t){['sost','linea'].forEach(function(k){var el=document.getElementById('sost-pane-'+k);if(el)el.style.display=k===t?'block':'none';});var bs=document.getElementById('sost-btn-sost'),bl=document.getElementById('sost-btn-linea');if(bs)bs.className='app-tab'+(t==='sost'?' act-post':'');if(bl)bl.className='app-tab'+(t==='linea'?' act-post':'');}
@@ -2128,7 +2130,8 @@ w.document.write('<!doctype html><html lang="it"><head><meta charset="utf-8"><ti
 if(!imgs||imgs.length===0){setTimeout(stampaOra,250);}
 else{var caricate=0;function conta(){caricate++;if(caricate>=imgs.length)setTimeout(stampaOra,150);}for(var i=0;i<imgs.length;i++){if(imgs[i].complete)conta();else{imgs[i].onload=conta;imgs[i].onerror=conta;}}setTimeout(stampaOra,4000);}}
 var _syncingDis=false;function sincronizzaDisegni(){if(!SYNC_ENABLED){toastNota('Sincronizzazione solo su app NAS');return;}
-if(_syncingDis)return;_syncingDis=true;toastNota('Sincronizzazione disegni...');fetch('/disegni',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disegni:disegni,progetti:progetti})}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(res){if(res&&res.error)throw new Error(res.error);disegni=(res&&res.disegni)?res.disegni:{};progetti=(res&&res.progetti)?res.progetti:{};salvaDisegniStorage();salvaProgetti();_migraProgetti();populaSelettoreProgetti();renderDisegni();renderElencoDisegni();toastNota('Disegni sincronizzati ('+_chiaviVive(disegni).length+')');}).catch(function(e){toastNota('Errore sync: '+e.message);}).then(function(){_syncingDis=false;});}
+if(_syncingDis)return;_syncingDis=true;toastNota('Sincronizzazione disegni...');fetch('/disegni',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disegni:disegni,progetti:progetti})}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(res){if(res&&res.error)throw new Error(res.error);disegni=(res&&res.disegni)?res.disegni:{};progetti=(res&&res.progetti)?res.progetti:{};salvaDisegniStorage();salvaProgetti();_migraProgetti();if(!_idsProgetto().length){var cont={};Object.keys(disegni).forEach(function(id){var el=disegni[id];if(_vivo(el)&&el.progetto)cont[el.progetto]=(cont[el.progetto]||0)+1;});var best=null,bestN=0;Object.keys(cont).forEach(function(pid){if(_vivo(progetti[pid])&&cont[pid]>bestN){bestN=cont[pid];best=pid;}});if(best)_progettoAttivo=best;}
+populaSelettoreProgetti();renderDisegni();renderElencoDisegni();toastNota('Disegni sincronizzati ('+_chiaviVive(disegni).length+')');}).catch(function(e){toastNota('Errore sync: '+e.message);}).then(function(){_syncingDis=false;});}
 (function(){var sp=document.getElementById('splash');if(!sp)return;setTimeout(function(){sp.classList.add('fade-out');setTimeout(function(){sp.style.display='none';},850);},2500);sp.addEventListener('click',function(){sp.classList.add('fade-out');setTimeout(function(){sp.style.display='none';},850);});})();</script>
 </body>
 </html>
