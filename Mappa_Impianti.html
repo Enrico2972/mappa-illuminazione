@@ -1465,6 +1465,10 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 .iv-item:hover .iv-id{color:#f9a8d4}
 .iv-empty{color:#94a3b8;font-style:italic;padding:26px;text-align:center;line-height:1.6}
 .build-ver{color:#64748b;font-size:10px;margin-left:6px;white-space:nowrap}
+@media print{
+  #controls,#panel,#stats-overlay,#interventi-overlay,#disegni-overlay,#dis-edit,#draw-bar,#nota-toast,#foto-lightbox,#splash,#build-ver,.leaflet-control-container{display:none!important}
+  @page{size:landscape;margin:6mm}
+}
 #interventi-gruppi{margin-bottom:14px}
 .rep-tot{background:#0a1e14;border:1px solid #14532d;color:#86efac;border-radius:8px;padding:9px 12px;font-size:14px;font-weight:700;margin-bottom:10px}
 .gr-tit{color:#8b949e;font-size:12px;font-weight:600;margin-bottom:6px}
@@ -1670,6 +1674,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
   <button onclick="openInterventi()" class="btn-topbar btn-stat-top" title="Elenco interventi da sopralluogo">&#128221; Interventi</button>
   <button class="tbtn tbtn-notelabel" id="btn-notelabel" onclick="toggleNoteLabels()" title="Mostra le note direttamente sulla mappa">&#127991; Etichette note</button>
   <button class="btn-topbar btn-stat-top" onclick="apriDisegno()" title="Strumenti di disegno progetto">&#9998; Disegna</button>
+  <button class="btn-topbar btn-stat-top" onclick="stampaPlanimetria()" title="Stampa o salva in PDF la planimetria visibile">&#128424; Planimetria</button>
   <a href="https://docs.google.com/spreadsheets/d/1T0Glf1EWjkO5xO_WxbXAGSverpqzU8wYKH8QWJbffB0/edit" target="_blank" class="btn-topbar btn-foglio-top">&#128196; Foglio Guasti</a>
   <button class="tbtn-geo" onclick="geolocate()" title="Geolocalizzazione">&#127759;</button>
   <span id="counter"></span>
@@ -1858,7 +1863,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
     <div id="panel-body"></div>
   </div>
 </div>
-<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='23/07 00:21';function noteKey(comune,id){return comune+'|'+id;}
+<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='23/07 00:34';function noteKey(comune,id){return comune+'|'+id;}
 function _tomba(){return{del:true,ts:Date.now()};}
 function _vivo(o){return!!o&&!o.del;}
 function _chiaviVive(obj){return Object.keys(obj).filter(function(k){return _vivo(obj[k]);});}
@@ -2054,6 +2059,8 @@ function card(num,lbl,sub,color){return'<div class="stat-card"><div class="num" 
 function handleDeepLink(clId,clComune){if(!clId)return;var found=null;markersCL.forEach(function(m){if(m.data.id===clId&&(!clComune||m.data.comune===clComune))found=m;});if(!found)markersCL.forEach(function(m){if(m.data.id===clId)found=m;});if(found){var sel=document.getElementById('comune-sel');if(sel)sel.value=found.data.comune;comuneAttivo=found.data.comune;applicaFiltroComune();updateCounter();map.setView(found.getLatLng(),18);found.setIcon(iconFound);openCL(found.data,found);}}
 var geoMarker=null;function geolocate(){if(!navigator.geolocation){alert('Geolocalizzazione non disponibile');return;}
 navigator.geolocation.getCurrentPosition(function(pos){var ll=[pos.coords.latitude,pos.coords.longitude];if(geoMarker)map.removeLayer(geoMarker);geoMarker=L.marker(ll,{icon:L.divIcon({className:'',html:'<div class="geo-dot"></div>',iconSize:[14,14],iconAnchor:[7,7]})}).addTo(map).bindPopup('&#127759; Sei qui').openPopup();map.setView(ll,16);},function(){alert('Impossibile ottenere la posizione');});}
+function stampaPlanimetria(){try{closePanel();}catch(e){}
+['stats-overlay','interventi-overlay','disegni-overlay','dis-edit','draw-bar'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('show');});toastNota('Preparazione stampa... scegli "Salva come PDF"');setTimeout(function(){window.print();},400);}
 var disegni={};var progetti={};var _progettoAttivo=null;var _disegnoTool=null;var _disegnoStato='nuovo';var _lineaInCorso=null;var _disegniVisibili=true;var _disegnoAttivo=false;var DIS_COLORE={esistente:'#22c55e',nuovo:'#f97316'};function loadDisegni(){try{var s=localStorage.getItem('disegniProgetto_v1');if(s)disegni=JSON.parse(s)||{};}catch(e){disegni={};}}
 function salvaDisegniStorage(){try{localStorage.setItem('disegniProgetto_v1',JSON.stringify(disegni));}catch(e){}}
 function _newDisId(){return'd'+Date.now()+'_'+Math.floor(Math.random()*10000);}
