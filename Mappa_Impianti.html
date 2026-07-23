@@ -1511,6 +1511,10 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 .btn-nota-del{background:#111827;color:#fca5a5;border:1px solid #7f1d1d;border-radius:6px;padding:9px 12px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px}
 #nota-toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#15803d;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;z-index:5000;box-shadow:0 4px 14px rgba(0,0,0,0.4);opacity:0;transition:opacity .25s;pointer-events:none}
 #nota-toast.show{opacity:1}
+#export-cover{display:none;position:fixed;inset:0;background:rgba(13,17,23,0.97);z-index:9000;align-items:center;justify-content:center;text-align:center}
+#export-cover.show{display:flex}
+#export-cover .ec-msg{color:#e2e8f0;font-size:18px;font-weight:600;line-height:1.6}
+#export-cover .ec-msg span{color:#8b949e;font-size:13px;font-weight:400}
 .nota-label{background:#831843;color:#fff;border:1px solid #ec4899;border-radius:6px;padding:2px 6px;font-size:10px;font-weight:600;line-height:1.25;width:110px;box-sizing:border-box;white-space:normal;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,0.45)}
 .leaflet-tooltip-top.nota-label:before{border-top-color:#ec4899}
 .leaflet-tooltip-bottom.nota-label:before{border-bottom-color:#ec4899}
@@ -1818,6 +1822,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
   </div>
 </div>
 <div id="nota-toast"></div>
+<div id="export-cover"><div class="ec-msg">&#128248; Generazione immagine in corso...<br><span>attendi qualche secondo</span></div></div>
 <div id="foto-lightbox" onclick="chiudiFoto()"><button class="fl-close" onclick="chiudiFoto()">&#10005;</button><img id="foto-lightbox-img" src="" alt="foto intervento"></div>
 <div id="draw-bar">
   <select id="draw-prog-sel" class="db-prog" onchange="selezionaProgetto(this.value)" title="Progetto attivo"></select>
@@ -1892,7 +1897,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
     <div id="panel-body"></div>
   </div>
 </div>
-<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='23/07 20:51';function noteKey(comune,id){return comune+'|'+id;}
+<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='23/07 22:46';function noteKey(comune,id){return comune+'|'+id;}
 function _tomba(){return{del:true,ts:Date.now()};}
 function _vivo(o){return!!o&&!o.del;}
 function _chiaviVive(obj){return Object.keys(obj).filter(function(k){return _vivo(obj[k]);});}
@@ -2094,11 +2099,12 @@ var geoMarker=null;function geolocate(){if(!navigator.geolocation){alert('Geoloc
 navigator.geolocation.getCurrentPosition(function(pos){var ll=[pos.coords.latitude,pos.coords.longitude];if(geoMarker)map.removeLayer(geoMarker);geoMarker=L.marker(ll,{icon:L.divIcon({className:'',html:'<div class="geo-dot"></div>',iconSize:[14,14],iconAnchor:[7,7]})}).addTo(map).bindPopup('&#127759; Sei qui').openPopup();map.setView(ll,16);},function(){alert('Impossibile ottenere la posizione');});}
 function stampaPlanimetria(){try{closePanel();}catch(e){}
 ['stats-overlay','interventi-overlay','disegni-overlay','dis-edit','draw-bar'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('show');});toastNota('Preparazione stampa... scegli "Salva come PDF"');setTimeout(function(){window.print();},400);}
-function esportaImmagine(){if(typeof html2canvas==='undefined'){toastNota('Attendi il caricamento della pagina e riprova');return;}
+var EXPORT_W=3400,EXPORT_H=2100;function esportaImmagine(){if(typeof html2canvas==='undefined'){toastNota('Attendi il caricamento della pagina e riprova');return;}
 if(typeof mapMode!=='undefined'&&mapMode!==0){toastNota('Passa alla mappa stradale (tasto Satellite) per esportare');return;}
 try{closePanel();}catch(e){}
-['stats-overlay','interventi-overlay','disegni-overlay','dis-edit','draw-bar','unif-dialog'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('show');});toastNota('Preparazione immagine... attendi');setTimeout(function(){html2canvas(document.getElementById('map'),{useCORS:true,backgroundColor:'#ffffff',scale:2,logging:false}).then(function(canvas){canvas.toBlob(function(blob){if(!blob){toastNota('Errore generazione immagine');return;}
-var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='planimetria_'+new Date().toISOString().slice(0,10)+'.png';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},2000);toastNota('Immagine salvata');},'image/png');}).catch(function(e){toastNota('Errore export: '+e.message);});},500);}
+['stats-overlay','interventi-overlay','disegni-overlay','dis-edit','draw-bar','unif-dialog'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('show');});var pts=[];_idsProgetto().forEach(function(id){var el=disegni[id];if(el&&el.punti)el.punti.forEach(function(p){pts.push(p);});});_noteFiltrate().forEach(function(n){if(n.lat&&n.lon)pts.push([n.lat,n.lon]);});var mapEl=document.getElementById('map');var sv={w:mapEl.style.width,h:mapEl.style.height,pos:mapEl.style.position,top:mapEl.style.top,left:mapEl.style.left,z:mapEl.style.zIndex};var svCenter=map.getCenter(),svZoom=map.getZoom();function ripristina(){mapEl.style.width=sv.w;mapEl.style.height=sv.h;mapEl.style.position=sv.pos;mapEl.style.top=sv.top;mapEl.style.left=sv.left;mapEl.style.zIndex=sv.z;map.invalidateSize();map.setView(svCenter,svZoom,{animate:false});var c=document.getElementById('export-cover');if(c)c.classList.remove('show');}
+var cov=document.getElementById('export-cover');if(cov)cov.classList.add('show');toastNota('Generazione immagine ad alta risoluzione...');mapEl.style.position='fixed';mapEl.style.top='0';mapEl.style.left='0';mapEl.style.zIndex='0';mapEl.style.width=EXPORT_W+'px';mapEl.style.height=EXPORT_H+'px';map.invalidateSize();if(pts.length)map.fitBounds(L.latLngBounds(pts),{padding:[110,110],animate:false});setTimeout(function(){html2canvas(mapEl,{useCORS:true,backgroundColor:'#ffffff',scale:1,logging:false,width:EXPORT_W,height:EXPORT_H}).then(function(canvas){canvas.toBlob(function(blob){ripristina();if(!blob){toastNota('Errore generazione immagine');return;}
+var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='planimetria_'+new Date().toISOString().slice(0,10)+'.png';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},2000);toastNota('Immagine salvata');},'image/png');}).catch(function(e){ripristina();toastNota('Errore export: '+e.message);});},2200);}
 var disegni={};var progetti={};var _progettoAttivo=null;var _disegnoTool=null;var _disegnoStato='nuovo';var _lineaInCorso=null;var _disegniVisibili=true;var _disegnoAttivo=false;var DIS_COLORE={esistente:'#22c55e',nuovo:'#f97316'};function loadDisegni(){try{var s=localStorage.getItem('disegniProgetto_v1');if(s)disegni=JSON.parse(s)||{};}catch(e){disegni={};}}
 function salvaDisegniStorage(){try{localStorage.setItem('disegniProgetto_v1',JSON.stringify(disegni));}catch(e){}}
 function _newDisId(){return'd'+Date.now()+'_'+Math.floor(Math.random()*10000);}
