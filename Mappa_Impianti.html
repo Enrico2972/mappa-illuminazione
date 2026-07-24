@@ -1693,7 +1693,8 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
   <button class="tbtn tbtn-notelabel" id="btn-notelabel" onclick="toggleNoteLabels()" title="Mostra le note direttamente sulla mappa">&#127991; Etichette note</button>
   <button class="btn-topbar btn-stat-top" onclick="apriDisegno()" title="Strumenti di disegno progetto">&#9998; Disegna</button>
   <button class="btn-topbar btn-stat-top" onclick="stampaPlanimetria()" title="Stampa o salva in PDF la planimetria visibile">&#128424; Planimetria</button>
-  <button class="btn-topbar btn-stat-top" onclick="esportaImmagine()" title="Esporta tutta la planimetria come immagine PNG (solo mappa stradale)">&#128248; Esporta img</button>
+  <button class="btn-topbar btn-stat-top" onclick="inquadraProgetto()" title="Inquadra tutti i disegni e gli interventi (utile su tablet prima di esportare)">&#127919; Inquadra</button>
+  <button class="btn-topbar btn-stat-top" onclick="esportaImmagine()" title="Esporta la planimetria come immagine PNG (solo mappa stradale)">&#128248; Esporta img</button>
   <a href="https://docs.google.com/spreadsheets/d/1T0Glf1EWjkO5xO_WxbXAGSverpqzU8wYKH8QWJbffB0/edit" target="_blank" class="btn-topbar btn-foglio-top">&#128196; Foglio Guasti</a>
   <button class="tbtn-geo" onclick="geolocate()" title="Geolocalizzazione">&#127759;</button>
   <span id="counter"></span>
@@ -1897,7 +1898,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
     <div id="panel-body"></div>
   </div>
 </div>
-<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='24/07 10:16';function noteKey(comune,id){return comune+'|'+id;}
+<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='24/07 11:51';function noteKey(comune,id){return comune+'|'+id;}
 function _tomba(){return{del:true,ts:Date.now()};}
 function _vivo(o){return!!o&&!o.del;}
 function _chiaviVive(obj){return Object.keys(obj).filter(function(k){return _vivo(obj[k]);});}
@@ -2099,6 +2100,8 @@ var geoMarker=null;function geolocate(){if(!navigator.geolocation){alert('Geoloc
 navigator.geolocation.getCurrentPosition(function(pos){var ll=[pos.coords.latitude,pos.coords.longitude];if(geoMarker)map.removeLayer(geoMarker);geoMarker=L.marker(ll,{icon:L.divIcon({className:'',html:'<div class="geo-dot"></div>',iconSize:[14,14],iconAnchor:[7,7]})}).addTo(map).bindPopup('&#127759; Sei qui').openPopup();map.setView(ll,16);},function(){alert('Impossibile ottenere la posizione');});}
 function stampaPlanimetria(){try{closePanel();}catch(e){}
 ['stats-overlay','interventi-overlay','disegni-overlay','dis-edit','draw-bar'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('show');});toastNota('Preparazione stampa... scegli "Salva come PDF"');setTimeout(function(){window.print();},400);}
+function inquadraProgetto(){var pts=[];_idsProgetto().forEach(function(id){var el=disegni[id];if(el&&el.punti)el.punti.forEach(function(p){pts.push(p);});});_noteFiltrate().forEach(function(n){if(n.lat&&n.lon)pts.push([n.lat,n.lon]);});if(!pts.length){toastNota('Nessun disegno o intervento da inquadrare');return;}
+map.fitBounds(L.latLngBounds(pts),{padding:[45,45]});toastNota('Inquadrati '+pts.length+' punti');}
 function esportaImmagine(){if(typeof html2canvas==='undefined'){toastNota('Attendi il caricamento della pagina e riprova');return;}
 if(typeof mapMode!=='undefined'&&mapMode!==0){toastNota('Passa alla mappa stradale (tasto Satellite) per esportare');return;}
 try{closePanel();}catch(e){}
