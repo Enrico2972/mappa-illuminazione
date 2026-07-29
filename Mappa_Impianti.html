@@ -1552,7 +1552,11 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 .linea-lab:before{display:none}
 .foto-badge{width:18px;height:18px;background:#0e7490;border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,0.45)}
 .dis-nota-lab{background:rgba(13,17,23,0.85);color:#fff;border:none;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.4)}
-.dis-nota-lab:before{border-top-color:rgba(13,17,23,0.85)}
+.dis-nota-lab:before{display:none}
+.dis-lab-wrap{width:0!important;height:0!important;background:none;border:none}
+.dis-lab-wrap .dlab{position:absolute;white-space:nowrap;cursor:move;-webkit-user-select:none;user-select:none;touch-action:none}
+.dis-lab-wrap.lab-sotto .dlab{transform:translate(-50%,9px)}
+.dis-lab-wrap.lab-sopra .dlab{transform:translate(-50%,calc(-100% - 9px))}
 #dis-edit{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:5500;align-items:center;justify-content:center;padding:16px}
 #dis-edit.show{display:flex}
 #dis-edit .de-box{background:#0d1117;border:1px solid #30363d;border-radius:12px;padding:16px;width:340px;max-width:94vw;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
@@ -1901,7 +1905,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
     <div id="panel-body"></div>
   </div>
 </div>
-<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='29/07 19:50';function noteKey(comune,id){return comune+'|'+id;}
+<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='29/07 20:32';function noteKey(comune,id){return comune+'|'+id;}
 function _tomba(){return{del:true,ts:Date.now()};}
 function _vivo(o){return!!o&&!o.del;}
 function _chiaviVive(obj){return Object.keys(obj).filter(function(k){return _vivo(obj[k]);});}
@@ -2137,8 +2141,11 @@ populaSelettoreProgetti();renderDisegni();toastNota('Progetto eliminato');}else{
 function lunghezzaLinea(punti){if(!punti||punti.length<2)return 0;var tot=0;for(var i=1;i<punti.length;i++){tot+=map.distance(punti[i-1],punti[i]);}
 return tot;}
 function formatMetri(m){return(m<1000)?(Math.round(m)+' m'):((m/1000).toFixed(2)+' km');}
-function disegnaElemento(el){var col=DIS_COLORE[el.stato]||DIS_COLORE.nuovo;var ov=null;if(el.tipo==='pl'){ov=L.circleMarker(el.punti[0],{radius:7,color:'#fff',weight:2,fillColor:col,fillOpacity:1});}else if(el.tipo==='qe'){ov=L.marker(el.punti[0],{icon:L.divIcon({className:'',html:'<div style="width:16px;height:16px;background:'+col+';border:2px solid #fff;border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.4)"></div>',iconSize:[16,16],iconAnchor:[8,8]})});}else if(el.tipo==='aerea'||el.tipo==='interrata'){L.polyline(el.punti,{color:'#0d1117',weight:6,opacity:0.35,interactive:false,dashArray:(el.tipo==='interrata'?'10,8':undefined)}).addTo(layerDisegni);ov=L.polyline(el.punti,{color:col,weight:3,opacity:1,dashArray:(el.tipo==='interrata'?'10,8':undefined)});var etl=formatMetri(lunghezzaLinea(el.punti));if(el.nota)etl=escHtml(el.nota)+' &middot; '+etl;if(el.foto&&el.foto.length)etl='&#128247; '+etl;ov.bindTooltip(etl,{permanent:true,direction:'bottom',offset:[0,10],className:'linea-lab'});}
-if(ov&&(el.tipo==='pl'||el.tipo==='qe')&&(el.nota||(el.foto&&el.foto.length))){var etp=(el.foto&&el.foto.length?'&#128247; ':'')+escHtml(el.nota||'');ov.bindTooltip(etp,{permanent:true,direction:'top',offset:[0,-9],className:'dis-nota-lab'});}
+function _defLabelPos(el){if(el.tipo==='pl'||el.tipo==='qe'||el.punti.length===1)return el.punti[0];var a=el.punti[0],b=el.punti[el.punti.length-1];return[(a[0]+b[0])/2,(a[1]+b[1])/2];}
+function creaEtichettaDisegno(el,testo,sotto){var pos=(el.labelPos&&el.labelPos.length===2)?el.labelPos:_defLabelPos(el);var cls=sotto?'linea-lab':'dis-nota-lab';var lm=L.marker(pos,{draggable:true,zIndexOffset:1000,icon:L.divIcon({className:'dis-lab-wrap '+(sotto?'lab-sotto':'lab-sopra'),html:'<div class="'+cls+' dlab">'+testo+'</div>',iconSize:null})});lm.on('dragstart',function(){lm._dragged=true;});lm.on('dragend',function(){var ll=lm.getLatLng();el.labelPos=[ll.lat,ll.lng];el.ts=Date.now();salvaDisegniStorage();setTimeout(function(){lm._dragged=false;},20);});lm.on('click',function(ev){if(ev&&ev.originalEvent)L.DomEvent.stopPropagation(ev.originalEvent);if(lm._dragged){lm._dragged=false;return;}
+apriNotaDisegno(el.id);});lm.addTo(layerDisegni);return lm;}
+function disegnaElemento(el){var col=DIS_COLORE[el.stato]||DIS_COLORE.nuovo;var ov=null;if(el.tipo==='pl'){ov=L.circleMarker(el.punti[0],{radius:7,color:'#fff',weight:2,fillColor:col,fillOpacity:1});}else if(el.tipo==='qe'){ov=L.marker(el.punti[0],{icon:L.divIcon({className:'',html:'<div style="width:16px;height:16px;background:'+col+';border:2px solid #fff;border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.4)"></div>',iconSize:[16,16],iconAnchor:[8,8]})});}else if(el.tipo==='aerea'||el.tipo==='interrata'){L.polyline(el.punti,{color:'#0d1117',weight:6,opacity:0.35,interactive:false,dashArray:(el.tipo==='interrata'?'10,8':undefined)}).addTo(layerDisegni);ov=L.polyline(el.punti,{color:col,weight:3,opacity:1,dashArray:(el.tipo==='interrata'?'10,8':undefined)});var etl=formatMetri(lunghezzaLinea(el.punti));if(el.nota)etl=escHtml(el.nota)+' &middot; '+etl;if(el.foto&&el.foto.length)etl='&#128247; '+etl;creaEtichettaDisegno(el,etl,true);}
+if(ov&&(el.tipo==='pl'||el.tipo==='qe')&&(el.nota||(el.foto&&el.foto.length))){var etp=(el.foto&&el.foto.length?'&#128247; ':'')+escHtml(el.nota||'');creaEtichettaDisegno(el,etp,false);}
 if(ov){ov._disId=el.id;ov.on('click',function(ev){if(_lineaInCorso)return;if(ev&&ev.originalEvent)L.DomEvent.stopPropagation(ev.originalEvent);apriNotaDisegno(el.id);});ov.addTo(layerDisegni);}
 return ov;}
 function renderLineaInCorso(){if(!_lineaInCorso||!_lineaInCorso.punti.length)return;var col=DIS_COLORE[_lineaInCorso.stato]||DIS_COLORE.nuovo;L.polyline(_lineaInCorso.punti,{color:col,weight:4,opacity:0.55,dashArray:(_lineaInCorso.tipo==='interrata'?'8,9':undefined)}).addTo(layerDisegni);_lineaInCorso.punti.forEach(function(p){L.circleMarker(p,{radius:4,color:'#fff',weight:1,fillColor:col,fillOpacity:1}).addTo(layerDisegni);});}
