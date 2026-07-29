@@ -1466,6 +1466,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 .iv-item:hover .iv-id{color:#f9a8d4}
 .iv-empty{color:#94a3b8;font-style:italic;padding:26px;text-align:center;line-height:1.6}
 .build-ver{color:#64748b;font-size:10px;margin-left:6px;white-space:nowrap}
+.geo-pin{background:none;border:none;font-size:28px;line-height:32px;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
 @media print{
   #topbar,#controls,#panel,#stats-overlay,#interventi-overlay,#disegni-overlay,#dis-edit,#unif-dialog,#draw-bar,#nota-toast,#foto-lightbox,#splash,#build-ver,.leaflet-control-container{display:none!important}
   @page{size:landscape;margin:6mm}
@@ -1673,6 +1674,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
     <option value="cl">&#128262; Cerca CL</option>
     <option value="qe">&#9889; Cerca QE</option>
     <option value="sem">&#128676; Cerca SEM</option>
+    <option value="geo">&#128205; Cerca via/comune</option>
   </select>
   <input type="text" id="search" placeholder="ID o indirizzo CL..." style="width:170px" onkeydown="if(event.key==='Enter')doSearch()">
   <button onclick="doSearch()" style="padding:5px 10px;background:#1f2937;color:white;border:none;border-radius:4px;cursor:pointer;font-size:13px;font-weight:bold">&#128269;</button>
@@ -1899,7 +1901,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
     <div id="panel-body"></div>
   </div>
 </div>
-<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='24/07 13:02';function noteKey(comune,id){return comune+'|'+id;}
+<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='29/07 19:50';function noteKey(comune,id){return comune+'|'+id;}
 function _tomba(){return{del:true,ts:Date.now()};}
 function _vivo(o){return!!o&&!o.del;}
 function _chiaviVive(obj){return Object.keys(obj).filter(function(k){return _vivo(obj[k]);});}
@@ -2067,8 +2069,9 @@ else if(type==='qesem'){vis.qesem?map.addLayer(layerQESEM):map.removeLayer(layer
 updateCounter();}
 function updateCounter(){var att=function(m){return comuneAttivo==='__tutti__'||m.data.comune===comuneAttivo;};var cl=markersCL.filter(att).length;var qe=markersQE.filter(att).length;var sem=markersSEM.filter(att).length;var qesem=markersQESEM.filter(att).length;var html='';if(vis.cl)html+='<span class="cnt-badge" style="border-color:#3b82f6">&#128262; '+(vis.cl?cl:0)+' CL</span>';if(vis.qe)html+='<span class="cnt-badge" style="border-color:#f97316">&#9889; '+(vis.qe?qe:0)+' QE</span>';if(sem>0&&vis.sem)html+='<span class="cnt-badge" style="border-color:#9C27B0">&#128676; '+sem+' SEM</span>';if(qesem>0&&vis.qesem)html+='<span class="cnt-badge" style="border-color:#6a1b9a">&#9711; '+qesem+' QE-SEM</span>';document.getElementById('counter').innerHTML=html;}
 function resetView(){if(comuneAttivo!=='__tutti__'&&centri[comuneAttivo])map.setView([centri[comuneAttivo].lat,centri[comuneAttivo].lon],13);else map.setView([45.30,7.895],13);resetHighlight();}
-function onSearchTypeChange(){var type=document.getElementById('search-type').value;var ph={cl:'ID o indirizzo CL...',qe:'N. quadro es. 0002 o 2...',sem:'ID o indirizzo semaforo...'};document.getElementById('search').placeholder=ph[type]||'Cerca...';document.getElementById('search').value='';clearSearch();}
-function doSearch(){var q=document.getElementById('search').value.trim().toLowerCase();var type=document.getElementById('search-type').value;resetHighlight();if(!q)return;function attivo(m){return comuneAttivo==='__tutti__'||m.data.comune===comuneAttivo;}
+function onSearchTypeChange(){var type=document.getElementById('search-type').value;var ph={cl:'ID o indirizzo CL...',qe:'N. quadro es. 0002 o 2...',sem:'ID o indirizzo semaforo...',geo:'Es. Cascinette di Ivrea via Cervi'};document.getElementById('search').placeholder=ph[type]||'Cerca...';document.getElementById('search').value='';clearSearch();}
+function doSearch(){var raw=document.getElementById('search').value.trim();var q=raw.toLowerCase();var type=document.getElementById('search-type').value;resetHighlight();if(!q)return;if(type==='geo'){cercaIndirizzo(raw);return;}
+function attivo(m){return comuneAttivo==='__tutti__'||m.data.comune===comuneAttivo;}
 if(type==='qe'){var found=null;markersQE.forEach(function(m){if(!attivo(m)){m.setOpacity(0);return;}
 var numPart=m.data.id.replace(/^[Qq]/,'');var numStripped=String(parseInt(numPart,10));var hit=numPart.indexOf(q)>=0||numStripped===q||m.data.indirizzo.toLowerCase().indexOf(q)>=0;m.setOpacity(hit?1:0.10);if(hit&&!found){found=m;}});markersCL.forEach(function(m){m.setOpacity(attivo(m)?0.06:0);});markersSEM.forEach(function(m){m.setOpacity(attivo(m)?0.06:0);});if(found){map.setView(found.getLatLng(),17);goToQE(found.data.comune,found.data.id);}}else if(type==='sem'){var found=null;markersSEM.forEach(function(m){if(!attivo(m)){m.setOpacity(0);return;}
 var d=m.data;var hit=[d.id,d.indirizzo,d.qe,d.tipo_post,d.marca_post,d.modello_post].join(' ').toLowerCase().indexOf(q)>=0;m.setOpacity(hit?1:0.06);if(hit&&!found){found=m;openSEM(d,m);}});markersCL.forEach(function(m){m.setOpacity(attivo(m)?0.06:0);});markersQE.forEach(function(m){m.setOpacity(attivo(m)?0.06:0);});if(found){map.setView(found.getLatLng(),17);if(_foundCL){_foundCL.setIcon(iconSEM);_foundCL=null;}
@@ -2076,7 +2079,10 @@ _foundCL=found;found.setIcon(iconFound);setTimeout(function(){if(_foundCL===foun
 var d=m.data;var hit=[d.id,d.indirizzo,d.qe,d.zona,d.marca,d.modello,d.sorgente,d.marca_post,d.modello_post].join(' ').toLowerCase().indexOf(q)>=0;if(_clusteringEnabled){setCLVisible(m,hit);}else{m.setOpacity(hit?1:0.06);}
 if(hit&&!found){found=m;openCL(d,m);}});markersQE.forEach(function(m){m.setOpacity(attivo(m)?0.06:0);});markersSEM.forEach(function(m){m.setOpacity(attivo(m)?0.06:0);});if(found){map.setView(found.getLatLng(),17);if(_foundCL){_foundCL.setIcon(_foundCL.isLED?iconLED:iconAnte);}
 _foundCL=found;found.setIcon(iconFound);setTimeout(function(){if(_foundCL===found){found.setIcon(found.isLED?iconLED:iconAnte);_foundCL=null;}},6000);}else{var msg=document.getElementById('search-msg');msg.innerHTML='&#10060; ID non trovato';msg.style.display='inline';setTimeout(function(){msg.style.display='none';},2500);}}}
-function clearSearch(){document.getElementById('search').value='';resetHighlight();}
+function clearSearch(){document.getElementById('search').value='';resetHighlight();if(_geoMarker){map.removeLayer(_geoMarker);_geoMarker=null;}}
+var _geoMarker=null;function cercaIndirizzo(q){if(!q)return;var msg=document.getElementById('search-msg');msg.style.color='#93c5fd';msg.innerHTML='&#8987; Ricerca in corso...';msg.style.display='inline';var url='https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=it&q='+encodeURIComponent(q);fetch(url,{headers:{'Accept':'application/json'}}).then(function(r){return r.json();}).then(function(res){if(!res||!res.length){msg.style.color='#f87171';msg.innerHTML='&#10060; Indirizzo non trovato';setTimeout(function(){msg.style.display='none';},3500);return;}
+var lat=parseFloat(res[0].lat),lon=parseFloat(res[0].lon);if(_geoMarker){map.removeLayer(_geoMarker);}
+_geoMarker=L.marker([lat,lon],{icon:L.divIcon({className:'geo-pin',html:'&#128205;',iconSize:[32,32],iconAnchor:[16,32],popupAnchor:[0,-30]})}).addTo(map);_geoMarker.bindPopup('<b>'+escHtml(q)+'</b><br><span style="font-size:11px;color:#555">'+escHtml(res[0].display_name)+'</span>').openPopup();map.setView([lat,lon],18);msg.style.display='none';}).catch(function(e){msg.style.color='#f87171';msg.innerHTML='&#10060; Errore di rete';setTimeout(function(){msg.style.display='none';},3500);});}
 var statsPeriod='all';function openStats(){var sel=document.getElementById('stats-comune');sel.innerHTML='<option value="__tutti__">Tutti i comuni</option>';var comuni=[];markersCL.forEach(function(m){if(comuni.indexOf(m.data.comune)<0)comuni.push(m.data.comune);});comuni.sort().forEach(function(c){sel.innerHTML+='<option value="'+c+'">'+c+'</option>';});sel.value=comuneAttivo;document.getElementById('stats-overlay').classList.add('show');renderStats();}
 function closeStats(){document.getElementById('stats-overlay').classList.remove('show');}
 function setPeriod(btn){document.querySelectorAll('.cfbtn').forEach(function(b){b.classList.remove('act');});btn.classList.add('act');statsPeriod=btn.getAttribute('data-p');renderStats();}
