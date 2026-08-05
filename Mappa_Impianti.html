@@ -1360,6 +1360,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 .tbtn-ante.on{border-color:#22c55e;background:#0a1e14}
 .tbtn-cluster.on{border-color:#22c55e;background:#0a1e14}
 .tbtn-legenda.on{border-color:#22c55e;background:#0a1e14}
+.tbtn-numeripl.on{border-color:#22c55e;background:#0a1e14}
 .tbtn-geo{border:1px solid #2d3748;color:#e2e8f0;background:#111827;padding:4px 8px;border-radius:5px;cursor:pointer;font-size:12px;font-family:Arial,sans-serif;font-weight:bold}
 .btn-topbar{padding:4px 10px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:bold;font-family:Arial,sans-serif;white-space:nowrap;border:1px solid;color:#e2e8f0}
 #btn-sat{background:#0d2040;border-color:#3b82f6}
@@ -1520,6 +1521,8 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 .nota-label{background:#831843;color:#fff;border:1px solid #ec4899;border-radius:5px;padding:1px 6px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.4)}
 .leaflet-tooltip-top.nota-label:before{border-top-color:#ec4899}
 .leaflet-tooltip-bottom.nota-label:before{border-bottom-color:#ec4899}
+.num-pl-label{background:rgba(30,41,59,0.88);color:#fff;border:1px solid #64748b;border-radius:4px;padding:0 5px;font-size:10px;font-weight:700;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.4)}
+.leaflet-tooltip-top.num-pl-label:before{border-top-color:#64748b}
 .leaflet-tooltip-left.nota-label:before{border-left-color:#ec4899}
 .leaflet-tooltip-right.nota-label:before{border-right-color:#ec4899}
 .foto-row{margin-top:8px}
@@ -1706,6 +1709,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
   <button onclick="openStats()" class="btn-topbar btn-stat-top" title="Statistiche guasti">&#128202; Statistiche</button>
   <button onclick="openInterventi()" class="btn-topbar btn-stat-top" title="Elenco interventi da sopralluogo">&#128221; Interventi</button>
   <button class="tbtn tbtn-notelabel" id="btn-notelabel" onclick="toggleNoteLabels()" title="Mostra le note direttamente sulla mappa">&#127991; Etichette note</button>
+  <button class="tbtn tbtn-numeripl" id="btn-numeripl" onclick="toggleNumeriPL()" title="Mostra i numeri di tutti i pali visibili (avvicinati con lo zoom)">&#128290; Numeri PL</button>
   <button class="tbtn tbtn-legenda" id="btn-legenda" onclick="toggleLegenda()" title="Mostra/nascondi la legenda sulla mappa (compare anche nell'export immagine)">&#8505; Legenda</button>
   <button class="btn-topbar btn-stat-top" onclick="apriDisegno()" title="Strumenti di disegno progetto">&#9998; Disegna</button>
   <button class="btn-topbar btn-stat-top" onclick="stampaPlanimetria()" title="Stampa o salva in PDF la planimetria visibile">&#128424; Planimetria</button>
@@ -1916,7 +1920,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
     <div id="panel-body"></div>
   </div>
 </div>
-<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='05/08 18:36';function noteKey(comune,id){return comune+'|'+id;}
+<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='05/08 19:44';function noteKey(comune,id){return comune+'|'+id;}
 function _tomba(){return{del:true,ts:Date.now()};}
 function _vivo(o){return!!o&&!o.del;}
 function _chiaviVive(obj){return Object.keys(obj).filter(function(k){return _vivo(obj[k]);});}
@@ -1946,10 +1950,16 @@ var _noteLabelsOn=false;function plNumero(id){var mm=(''+id).match(/(\d+)/);retu
 function noteLabelHtml(testo){return escHtml(testo).split(String.fromCharCode(10)).join('<br>');}
 function notaLabelFull(m,n,isQE){var cam=(n.foto&&n.foto.length)?'&#128247; ':'';return cam+(isQE?'QE ':'PL ')+escHtml(plNumero(m.data.id));}
 function defaultTooltip(m,isQE){var content=isQE?('QE '+m.data.id):m.data.id;m.bindTooltip(content,{permanent:false,direction:'top',offset:[0,-8],className:isQE?'qe-tooltip':'cl-tooltip'});}
-function applicaNotaLabel(m,isQE){var n=noteInterventi[noteKey(m.data.comune,m.data.id)];var wantNota=!!(_noteLabelsOn&&_vivo(n));if(wantNota){if(m._notaLabelOn){m.setTooltipContent(notaLabelFull(m,n,isQE));}
-else{m.unbindTooltip();m.bindTooltip(notaLabelFull(m,n,isQE),{permanent:true,direction:'top',offset:[0,-8],className:'nota-label',opacity:1});m._notaLabelOn=true;}}else if(m._notaLabelOn){m.unbindTooltip();defaultTooltip(m,isQE);m._notaLabelOn=false;}}
-function updateNoteLabels(){markersCL.forEach(function(m){applicaNotaLabel(m,false);});markersQE.forEach(function(m){applicaNotaLabel(m,true);});}
+var _numeriPLOn=false;var NUM_PL_ZOOM=18;function _applicaEtichettaMarker(m,isQE,inView,zoomOk){var n=noteInterventi[noteKey(m.data.comune,m.data.id)];var hasNota=_vivo(n);var mode='default';if(_noteLabelsOn&&hasNota)mode='nota';else if(!isQE&&_numeriPLOn&&!hasNota&&inView&&zoomOk)mode='num';if(mode==='nota'){if(m._labMode==='nota'){m.setTooltipContent(notaLabelFull(m,n,isQE));}
+else{m.unbindTooltip();m.bindTooltip(notaLabelFull(m,n,isQE),{permanent:true,direction:'top',offset:[0,-8],className:'nota-label',opacity:1});m._labMode='nota';}}else if(mode==='num'){if(m._labMode!=='num'){m.unbindTooltip();m.bindTooltip('PL '+escHtml(plNumero(m.data.id)),{permanent:true,direction:'top',offset:[0,-8],className:'num-pl-label',opacity:1});m._labMode='num';}}else{if(m._labMode&&m._labMode!=='default'){m.unbindTooltip();defaultTooltip(m,isQE);}
+m._labMode='default';}}
+function applicaNotaLabel(m,isQE){_applicaEtichettaMarker(m,isQE,false,false);}
+function updateNoteLabels(){var zoomOk=map.getZoom()>=NUM_PL_ZOOM;var bounds=(_numeriPLOn&&zoomOk)?map.getBounds():null;markersCL.forEach(function(m){var inView=bounds?bounds.contains(m.getLatLng()):false;_applicaEtichettaMarker(m,false,inView,zoomOk);});markersQE.forEach(function(m){_applicaEtichettaMarker(m,true,false,false);});}
 function toggleNoteLabels(){_noteLabelsOn=!_noteLabelsOn;var b=document.getElementById('btn-notelabel');if(b){if(_noteLabelsOn)b.classList.add('on');else b.classList.remove('on');}
+updateNoteLabels();}
+var _numListenerAdded=false;function toggleNumeriPL(){_numeriPLOn=!_numeriPLOn;var b=document.getElementById('btn-numeripl');if(b){if(_numeriPLOn)b.classList.add('on');else b.classList.remove('on');}
+if(_numeriPLOn&&!_numListenerAdded){map.on('moveend zoomend',function(){if(_numeriPLOn)updateNoteLabels();});_numListenerAdded=true;}
+if(_numeriPLOn&&map.getZoom()<NUM_PL_ZOOM){toastNota('Avvicinati con lo zoom per vedere i numeri dei PL');}
 updateNoteLabels();}
 var _ivListenerAdded=false;function openInterventi(){if(!_ivListenerAdded){document.getElementById('interventi-list').addEventListener('click',function(e){var del=e.target&&e.target.closest?e.target.closest('.iv-del'):null;if(del){var k=del.getAttribute('data-key');if(_vivo(noteInterventi[k])){noteInterventi[k]=_tomba();salvaNoteStorage();updateGuastoMarkers();updateNoteLabels();renderInterventi();}return;}
 var item=e.target&&e.target.closest?e.target.closest('.iv-item'):null;if(item){vaiAIntervento(item.getAttribute('data-comune'),item.getAttribute('data-id'),item.getAttribute('data-tipo'),parseFloat(item.getAttribute('data-lat')),parseFloat(item.getAttribute('data-lon')));}});document.getElementById('interventi-gruppi').addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('.gr-ed'):null;if(b){modificaTestoGruppo(b.getAttribute('data-testo'));}});_ivListenerAdded=true;}
