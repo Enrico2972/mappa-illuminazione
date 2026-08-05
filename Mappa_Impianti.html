@@ -1359,6 +1359,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 .tbtn-guasti.on{border-color:#22c55e;background:#0a1e14}
 .tbtn-ante.on{border-color:#22c55e;background:#0a1e14}
 .tbtn-cluster.on{border-color:#22c55e;background:#0a1e14}
+.tbtn-legenda.on{border-color:#22c55e;background:#0a1e14}
 .tbtn-geo{border:1px solid #2d3748;color:#e2e8f0;background:#111827;padding:4px 8px;border-radius:5px;cursor:pointer;font-size:12px;font-family:Arial,sans-serif;font-weight:bold}
 .btn-topbar{padding:4px 10px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:bold;font-family:Arial,sans-serif;white-space:nowrap;border:1px solid;color:#e2e8f0}
 #btn-sat{background:#0d2040;border-color:#3b82f6}
@@ -1558,6 +1559,13 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
 .dis-lab-wrap.lab-sotto .dlab{transform:translate(-50%,9px)}
 .dis-lab-wrap.lab-sopra .dlab{transform:translate(-50%,calc(-100% - 9px))}
 .freccia-testa{background:none;border:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,0.4))}
+.legenda-box{background:rgba(13,17,23,0.86);color:#e2e8f0;border:1px solid rgba(255,255,255,0.15);border-radius:7px;padding:8px 11px;font-size:12px;line-height:1.5;box-shadow:0 2px 10px rgba(0,0,0,0.5)}
+.legenda-box .lg-tit{font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:#93c5fd;margin-bottom:5px}
+.legenda-box .lg-row{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.legenda-box .lg-dot{width:12px;height:12px;border-radius:50%;border:2px solid #fff;flex:0 0 auto}
+.legenda-box .lg-line{width:22px;height:0;border-top:3px solid #cbd5e1;flex:0 0 auto}
+.legenda-box .lg-line.dashed{border-top-style:dashed}
+.legenda-box .lg-arrow{color:#fff;font-weight:700;width:22px;text-align:center;flex:0 0 auto}
 #dis-edit{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:5500;align-items:center;justify-content:center;padding:16px}
 #dis-edit.show{display:flex}
 #dis-edit .de-box{background:#0d1117;border:1px solid #30363d;border-radius:12px;padding:16px;width:340px;max-width:94vw;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
@@ -1698,6 +1706,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
   <button onclick="openStats()" class="btn-topbar btn-stat-top" title="Statistiche guasti">&#128202; Statistiche</button>
   <button onclick="openInterventi()" class="btn-topbar btn-stat-top" title="Elenco interventi da sopralluogo">&#128221; Interventi</button>
   <button class="tbtn tbtn-notelabel" id="btn-notelabel" onclick="toggleNoteLabels()" title="Mostra le note direttamente sulla mappa">&#127991; Etichette note</button>
+  <button class="tbtn tbtn-legenda" id="btn-legenda" onclick="toggleLegenda()" title="Mostra/nascondi la legenda sulla mappa (compare anche nell'export immagine)">&#8505; Legenda</button>
   <button class="btn-topbar btn-stat-top" onclick="apriDisegno()" title="Strumenti di disegno progetto">&#9998; Disegna</button>
   <button class="btn-topbar btn-stat-top" onclick="stampaPlanimetria()" title="Stampa o salva in PDF la planimetria visibile">&#128424; Planimetria</button>
   <button class="btn-topbar btn-stat-top" onclick="inquadraProgetto()" title="Inquadra tutti i disegni e gli interventi (utile su tablet prima di esportare)">&#127919; Inquadra</button>
@@ -1907,7 +1916,7 @@ select,input[type=text]{padding:4px 8px;border:1px solid #374151;border-radius:5
     <div id="panel-body"></div>
   </div>
 </div>
-<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='29/07 23:37';function noteKey(comune,id){return comune+'|'+id;}
+<script>var _comuniIndex=[];var _comuniCaricati={};var SCRIPT_URL='https://script.google.com/macros/s/AKfycbwR6IQzbeh-U17v-YhV-h3pqQm9C_n9cCs_qEhg7czgpwKS1vWdjys1eNHv1xHkgsKflw/exec';var guastiMap={};var modificheMap={};var comuniStartDate={};var NOTE_CHIP=['Sostituire con medesimo palo','Rastremata da tiro','Sostituire armatura','Palo da raddrizzare','Sostituire sbraccio','Verniciare palo','Rifare allaccio / morsettiera'];var noteInterventi={};var _notaCurrent=null;var SYNC_ENABLED=false;var BUILD_VER='05/08 17:58';function noteKey(comune,id){return comune+'|'+id;}
 function _tomba(){return{del:true,ts:Date.now()};}
 function _vivo(o){return!!o&&!o.del;}
 function _chiaviVive(obj){return Object.keys(obj).filter(function(k){return _vivo(obj[k]);});}
@@ -2113,6 +2122,9 @@ var geoMarker=null;function geolocate(){if(!navigator.geolocation){alert('Geoloc
 navigator.geolocation.getCurrentPosition(function(pos){var ll=[pos.coords.latitude,pos.coords.longitude];if(geoMarker)map.removeLayer(geoMarker);geoMarker=L.marker(ll,{icon:L.divIcon({className:'',html:'<div class="geo-dot"></div>',iconSize:[14,14],iconAnchor:[7,7]})}).addTo(map).bindPopup('&#127759; Sei qui').openPopup();map.setView(ll,16);},function(){alert('Impossibile ottenere la posizione');});}
 function stampaPlanimetria(){try{closePanel();}catch(e){}
 ['stats-overlay','interventi-overlay','disegni-overlay','dis-edit','draw-bar'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('show');});toastNota('Preparazione stampa... scegli "Salva come PDF"');setTimeout(function(){window.print();},400);}
+var _legendaCtrl=null,_legendaOn=false;function legendaHtml(){return'<div class="legenda-box">'+'<div class="lg-tit">Legenda</div>'+'<div class="lg-row"><span class="lg-dot" style="background:#f97316"></span>Nuovo</div>'+'<div class="lg-row"><span class="lg-dot" style="background:#22c55e"></span>Esistente</div>'+'<div class="lg-row"><span class="lg-line"></span>Cavo aereo</div>'+'<div class="lg-row"><span class="lg-line dashed"></span>Cavo interrato</div>'+'<div class="lg-row"><span class="lg-arrow">&#10142;</span>Indicatore</div>'+'</div>';}
+function toggleLegenda(){_legendaOn=!_legendaOn;if(_legendaOn){_legendaCtrl=L.control({position:'bottomright'});_legendaCtrl.onAdd=function(){var d=L.DomUtil.create('div','legenda-ctrl');d.innerHTML=legendaHtml();L.DomEvent.disableClickPropagation(d);L.DomEvent.disableScrollPropagation(d);return d;};_legendaCtrl.addTo(map);}else if(_legendaCtrl){map.removeControl(_legendaCtrl);_legendaCtrl=null;}
+var b=document.getElementById('btn-legenda');if(b){if(_legendaOn)b.classList.add('on');else b.classList.remove('on');}}
 var BIG_W=4000,BIG_H=2800;function esportaImmagineCompleta(){if(typeof html2canvas==='undefined'){toastNota('Attendi il caricamento della pagina e riprova');return;}
 if(typeof mapMode!=='undefined'&&mapMode!==0){toastNota('Passa alla mappa stradale (tasto Satellite) per esportare');return;}
 var pts=[];_idsProgetto().forEach(function(id){var el=disegni[id];if(el&&el.punti)el.punti.forEach(function(p){pts.push(p);});});_noteFiltrate().forEach(function(n){if(n.lat&&n.lon)pts.push([n.lat,n.lon]);});if(!pts.length){toastNota('Nessun disegno o intervento da esportare');return;}
